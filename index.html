@@ -58,13 +58,14 @@ h1{
         let form = document.querySelector("form");
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            document.querySelector("#sub").value = "Submiting..";
+            document.querySelector("#sub").value = "ກຳລັງບັນທຶກໃສ່ Google Drive ຂອງທ່ານ...";
             let data = new FormData(form);
             fetch('https://script.google.com/macros/s/AKfycbzgYl00J1EWDvixxntSk3t4MX9WXzNNHqSHTfbS6f-p1R4A7hv3963Eq7VPqzFypVAQgA/exec', {
                     method: "POST",
                     body: data
                 })
-                .then(response => alert("ບັນທຶກສຳເລັດ", location.reload()))
+                .then(response => alert("ການບັນທຶກສຳເລັດຮຽບຮ້ອຍແລ້ວ", location.reload()))
+                .catch(error => console.error('Error!', error.message))
         })
     </script>
 </body>
