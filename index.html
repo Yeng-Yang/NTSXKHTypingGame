@@ -1,0 +1,72 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML form to Google Sheet</title>
+</head>
+<style>
+    *{
+        font-family: phetsarath ot;
+    }
+.tex_Descriptoin{
+    width: 100%;
+    height: 50px;
+    text-align: start;
+}
+.Form_Entry{
+    text-align: center;
+
+}
+h1{
+    text-align: center;
+}
+</style>
+ 
+<body>
+    <h1 id="msg"><b><i><u>ລາຍງານວຽກປະຈຳວັນ</u></i></b></h1>
+     <form class="Form_Entry">
+        
+        <label>ປະຈຳວັນ</label>
+        <select name="The_Day" required>
+            <option></option>
+            <option>ອາທິດ</option>
+            <option>ຈັນ</option>
+            <option>ອັງຄານ</option>
+            <option>ພຸດ</option>
+            <option>ພະຫັດ</option>
+            <option>ສຸກ</option>
+            <option>ເສົດ</option>
+        </select><br><br>
+        <label>ວັນທີ່ເຮັດວຽກ</label>
+        <input type="date" name="Work_on_Date" required ><br><br>
+
+        <label>ເວລາເລີ່ມຕົ້ນ</label>
+        
+        <input type="time" name="Start_Time" required >
+        <label>ເວລາສິ້ນສຸດ</label>
+        <input type="time" name="End_Time" required ><br><br>
+
+        <label>ເຮັດວຽກກ່ຽວກັບ</label>
+        <input class="tex_Descriptoin" type="text" name="Descriptoin" placeholder='enter your Descriptoin'><br><br>
+        <input type="submit" id="sub">
+        <button type="reset">Reset Form</button>
+    </form>
+
+    <script>
+        let form = document.querySelector("form");
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.querySelector("#sub").value = "Submiting..";
+            let data = new FormData(form);
+            fetch('https://script.google.com/macros/s/AKfycbzgYl00J1EWDvixxntSk3t4MX9WXzNNHqSHTfbS6f-p1R4A7hv3963Eq7VPqzFypVAQgA/exec', {
+                    method: "POST",
+                    body: data
+                })
+                .then(response => alert("ບັນທຶກສຳເລັດ", location.reload()))
+        })
+    </script>
+</body>
+ 
+</html>
