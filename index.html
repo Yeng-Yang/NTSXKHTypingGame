@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML form to Google Sheet</title>
+    <script type="text/javascript" src="jquery.min.js"></script>
+</head>
+<style>
+    * {
+        font-family: phetsarath ot;
+        text-align: center;
+    }
+
+    .tex_Descriptoin {
+        width: 100%;
+        height: 50px;
+        text-align: start;
+    }
+
+    h1 {
+        text-align: center;
+        background-color: aqua;
+    }
+    .Form_Entry{
+        width: 100;
+    }
+</style>
+
+<body>
+    <h1 id="msg"><b><i><u>ບັນທຶກເງິນຖວາຍ</u></i></b></h1>
+    <form class="Form_Entry">
+
+        <label>Recod_Number</label><br>
+        <input type="text" name="Recod_Number" required placeholder='enter Recod_Number'>
+        <br><br>
+        <label>Date</label><br>
+        <input type="Date" name="Date" required >
+        <br><br>
+        <label>Time_to_work</label><br>
+        <input type="time" name="Time_to_work" required>
+        <br><br>
+        <label>End_of_work_time</label><br>
+        <input type="time" name="End_of_work_time" required>
+        <br><br>
+        <label>Completed_work_details</label><br>
+        <input type="text" class="tex_Descriptoin" name="Completed_work_details" required placeholder='enter Completed_work_details'>
+        <br><br>
+
+        <center><input type="submit" id="sub" value="ບັນທຶກ"></center>
+
+    </form>
+    <hr>
+<iframe src="Entry_history.html" width="100%" height="500px" frameborder="0"></iframe>
+    <script>
+        let form = document.querySelector("form");
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            document.querySelector("#sub").value = "ກຳລັງບັນທຶກໃສ່ Google Drive ຂອງທ່ານ...";
+            let data = new FormData(form);
+            fetch('https://script.google.com/macros/s/AKfycbzlmx1hD4fBxuhrRlvhREsmEg4qIgABm2bj7fTT_f6CC1cdHf2oVM20D8ZLRVQiAkDB/exec', {
+                method: "POST",
+                body: data
+            })
+                .then(response => alert("ການບັນທຶກສຳເລັດຮຽບຮ້ອຍແລ້ວ", location.reload()))
+                .catch(error => console.error('Error!', error.message))
+        })
+    </script>
+</body>
+<script>
+    document.addEventListener('contextmenu', event => event.preventDefault()) 
+</script>
+
+</html>

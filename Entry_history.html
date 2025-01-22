@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summary1</title>
+    <!-- Bootstrap CSS 5.1.1 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <!-- Google Fonts -->
+    <link
+        href='https://fonts.googleapis.com/css?family=Itim|Kanit|Mali|Mitr|Niramit|Pattaya|Prompt|Questrial|Sarabun|Sriracha'
+        rel='stylesheet' type='text/css'>
+</head>
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
+    integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sheetrock@1.2.0/dist/sheetrock.min.js"></script>
+<script src="https://unpkg.com/datatables@1.10.18/media/js/jquery.dataTables.min.js"></script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.2/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/searchbuilder/1.2.1/css/searchBuilder.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.1.1/css/dataTables.dateTime.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap4.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/colreorder/1.5.4/css/colReorder.dataTables.min.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wdth,wght@87.5,500&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+<style>
+    * {
+        font-family: "Noto Sans Lao", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 500;
+        font-style: normal;
+        font-variation-settings:
+            "wdth" 87.5;
+    }
+
+    a {
+        text-decoration: none !important;
+        color: #000 !important;
+    }
+
+    .activess {
+        color: blue !important;
+    }
+
+    .text-one {
+        text-align: center;
+        font-size: 50px;
+        color: rgb(3, 3, 75);
+        letter-spacing: 3px;
+    }
+
+    h1 {
+        background-color: aqua;
+    }
+
+    a {
+        border: 12px;
+        margin: auto;
+        background-color: chartreuse;
+    }
+</style>
+
+<body>
+
+    <center>
+        <h1>ປະຫວັດການເຮັດວຽກ </h1>
+    </center>
+    <a href=""></a>
+    <div class="container">
+        <table id="example" class="table table-condensed table-striped"></table>
+    </div>
+
+    <script src="https://cdn.datatables.net/1.11.2/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/searchbuilder/1.2.1/js/dataTables.searchBuilder.min.js"></script>
+    <script src="https://cdn.datatables.net/searchbuilder/1.2.1/js/searchBuilder.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/datetime/1.1.1/js/dataTables.dateTime.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/1.5.4/js/dataTables.colReorder.min.js"></script>
+
+
+</body>
+<script>
+    // Define spreadsheet URL.
+    var mySpreadsheet = 'https://docs.google.com/spreadsheets/d/1zE0Weu5sG2DchaRXo4w7mx1yvUgcX87MHqR8Zypn4r8/edit?gid=0#gid=0';
+
+    // Load top ten switch hitters.
+    $('#example').sheetrock({
+        url: mySpreadsheet,
+        query: ("select A,B,C,D,E "),
+    }).on('sheetrock:loaded', function () {
+        $(this).DataTable({
+
+            responsive: true,
+            colReorder: true,
+            lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50, "ທັງໝົດ"]],
+            order: [[0, "asc"], [1, "asc"], [2, "asc"]],
+
+            language: {
+                sProcessing: "กำลังดำเนินการ...",
+                sLengthMenu: "ການສະແດງຂໍ້ມູນ _MENU_ ແຖວ",
+                sZeroRecords: "ບໍມີຂໍ້ມູນ ສຳລັບລາຍການນີ້",
+                sInfo: "ສະແດງແຖວ _START_ ຫາແຖວທີ _END_ ຈາກ _TOTAL_ ແຖວ",
+                sInfoEmpty: "ສະແດງແຖວ 0 ຫາແຖວທີ 0 ຈາກ 0 ແຖວ",
+                sInfoFiltered: "(กรองข้อมูล _MAX_ ทุกแถว)",
+                sInfoPostFix: "",
+                sSearch: "ຄົ້ນຫາຂໍມູນ:",
+                sUrl: "",
+                oPaginate: {
+                    sFirst: "ໜ້າທຳອິດ",
+                    sPrevious: "<< ກ່ອນໜ້າ",
+                    sNext: "ຕໍ່ໄປ >>",
+                    sLast: "ໜ້າສຸດທ້າຍ"
+                }
+
+            },
+
+        }
+
+        );
+    });
+</script>
+<script>
+    document.addEventListener('contextmenu', event => event.preventDefault()) 
+</script>
+
+</html>
