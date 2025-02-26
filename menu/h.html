@@ -62,7 +62,7 @@
     // Load top ten switch hitters.
     $('#example').sheetrock({
         url: mySpreadsheet,
-        query: ("select B,A"),
+        query: ("select A,B "),
     }).on('sheetrock:loaded', function () {
         $(this).DataTable({
 
