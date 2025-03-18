@@ -64,18 +64,18 @@
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
-        <div class="modal-header shadow-lg p-4">
-          <h1 class="modal-title fs-5" id="exampleModalLabel"><b>ຟອມບັນທຶກ Stock ຈ່າຍອອກ</b></h1>
+        <div class="modal-header shadow-lg p-4" style="background-color: blue;">
+          <h1 class="modal-title fs-5" id="exampleModalLabel" style="color: aliceblue;"><b><u>ຟອມບັນທຶກ ການລາຍງານປະຈຳວັນ</u></b></h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
-            <form method="post" autocomplete="off" name="hello-sheet">
+            <form method="post" autocomplete="off" name="hello-sheet" style="background-color: aqua;">
 
                 <div class="modal-body p-4">
-                    <form method="post" autocomplete="off" name="hello-sheet">
-            
+                    <form class="Form_Entry">
+
                         <div class="row">
-                            <div class="col-sm-2">
+                            <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="name">ວັນທີເຮັດວຽກ</label>
                                     <input type="date" class="form-control" name="Date" required>
@@ -91,10 +91,9 @@
                                 </div>
                             </div>
                         </div>
-            
-                        <div class="form-group mt-4" style="text-align: center;">
-                            <button type="submit" name="submit" value="Send message" class="btn btn-primary me-3">ບັນທຶກ</button>
-                            <button type="reset" class="btn btn-danger" data-bs-dismiss="modal" name="reset" >ລ້າງຟອມ</button>
+                        <br>
+                        <center><input type="submit" id="sub" value="ບັນທຶກ"></center>
+                
                     </form>
                 </div>
 
@@ -111,16 +110,19 @@
     crossorigin="anonymous"></script>
 <script src="https://www.drv.tw/inc/wd.js?s=mbh7xjbmlwtkvihesf0dzg"></script>
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbzJalweuqdXPdJfOWd3GY5k3GxaqM7jy9Ru7c1RfuS7r3CQGE2Tg4gq6HWzbJCsm0NnPQ/exec'
-    const form = document.forms['hello-sheet']
-
-    form.addEventListener('submit', e => {
-      e.preventDefault()
-      fetch(scriptURL, { method: 'POST', body: new FormData(form) })
-        .then(response => alert("ບັນທຶກສຳເລັດ", location.reload()))
-        .catch(error => console.error('Error!', error.message))
+    let form = document.querySelector("form");
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        document.querySelector("#sub").value = "ກຳລັງຮ້ອງຂໍການບັນທຶກຂໍ້ມູນຂອງທ່ານ...";
+        let data = new FormData(form);
+        fetch('https://script.google.com/macros/s/AKfycbzC7heGPFGwY_WqLfVvP4dPvcyxhM15nNq26PNyi7NcncSPUUhF_03La0cRlL1t-tT7fA/exec', {
+            method: "POST",
+            body: data
+        })
+            .then(response => alert("ການບັນທຶກສຳເລັດຮຽບຮ້ອຍແລ້ວ", location.reload()))
+            .catch(error => console.error('Error!', error.message))
     })
-  </script>
+</script>
 </body>
 
 
