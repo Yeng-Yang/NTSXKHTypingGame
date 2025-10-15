@@ -1,76 +1,807 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="lo">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML form to Google Sheet</title>
-    <script type="text/javascript" src="jquery.min.js"></script>
+    <title>ຍອດວິລະຊົນນ້ອຍພິຊິດຄຳສັບ ແລະ ຕົວອັກສອນ</title>
+    <style>
+        /* -------------------------- */
+        /* CSS ສໍາລັບການອອກແບບ */
+        /* -------------------------- */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container {
+            width: 800px;
+            height: 500px;
+            border: 5px solid #4CAF50;
+            background-color: #000033;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        #player {
+            position: absolute;
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 30px;
+            color: #00796B;
+            padding: 10px;
+            background: #B2DFDB;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 5; 
+        }
+
+        .enemy {
+            position: absolute;
+            right: 0;
+            width: auto;
+            padding: 10px 15px;
+            min-width: 60px;
+            height: 40px;
+            background-color: #FFCDD2;
+            border: 2px solid #D32F2F;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #D32F2F;
+            transition: background-color 0.1s; 
+            cursor: pointer;
+            z-index: 2; 
+            white-space: nowrap;
+        }
+        
+        .highlight {
+            color: #4CAF50; 
+            font-weight: bold;
+        }
+
+        .bullet {
+            position: absolute;
+            width: 15px;
+            height: 5px;
+            background-color: #FFC107; 
+            border-radius: 2px;
+            z-index: 4; 
+        }
+
+        #stats {
+            width: 800px;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 10px 0;
+            font-size: 18px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item {
+            padding: 0 15px;
+            text-align: center;
+        }
+
+        .stat-item span {
+            font-weight: bold;
+            color: #388E3C;
+        }
+
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            font-weight: bold;
+            color: #F44336;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 10;
+            display: none;
+            text-align: center;
+        }
+        
+        /* ໜ້າຈໍຕ່າງໆ (Start, Mode, Result) */
+        #start-screen, #mode-screen, #result-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        #mode-screen, #result-screen {
+             display: none; 
+        }
+
+        /* Result Screen Styles */
+        #result-details {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            margin: 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+        .result-item span {
+            font-weight: bold;
+            color: #FFEB3B;
+        }
+
+        .lang-button {
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .mode-button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
+        }
+
+        #lao-btn { background-color: #FFEB3B; color: #333; }
+        #en-btn { background-color: #2196F3; color: white; }
+
+        /* Global Controls ໃໝ່ */
+        #controls-global {
+            width: 800px;
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .control-button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        #restart-btn { background-color: #4CAF50; color: white; }
+        #exit-btn { background-color: #F44336; color: white; }
+        #back-to-menu-btn { background-color: #FF9800; color: white; }
+        
+        #progress-display {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 10;
+        }
+    </style>
 </head>
-<style>
-    * {
-        font-family: phetsarath ot;
-        text-align: center;
-    }
-
-    .tex_Descriptoin {
-        width: 100%;
-        height: 50px;
-        text-align: start;
-    }
-
-    h1 {
-        text-align: center;
-        background-color: aqua;
-    }
-    .Form_Entry{
-        width: 100;
-    }
-</style>
-
 <body>
-    <h1 id="msg"><b><i><u>ບັນທຶກເງິນຖວາຍ</u></i></b></h1>
-    <form class="Form_Entry">
 
-        <label>Recod_Number</label><br>
-        <input type="text" name="Recod_Number" required placeholder='enter Recod_Number'>
-        <br><br>
-        <label>Date</label><br>
-        <input type="Date" name="Date" required >
-        <br><br>
-        <label>Time_to_work</label><br>
-        <input type="time" name="Time_to_work" required>
-        <br><br>
-        <label>End_of_work_time</label><br>
-        <input type="time" name="End_of_work_time" required>
-        <br><br>
-        <label>Completed_work_details</label><br>
-        <input type="text" class="tex_Descriptoin" name="Completed_work_details" required placeholder='enter Completed_work_details'>
-        <br><br>
+    <h1>ຍອດວິລະຊົນນ້ອຍພິຊິດຄຳສັບ ແລະ ຕົວອັກສອນ</h1>
 
-        <center><input type="submit" id="sub" value="ບັນທຶກ"></center>
+    <div id="game-container">
+        <div id="player">🚀</div>
 
-    </form>
-    <hr>
-<iframe src="Entry_history.html" width="100%" height="500px" frameborder="0"></iframe>
+        <div id="start-screen">
+            <h2>ເລືອກພາສາ / Choose Language</h2>
+            <div class="mode-section">
+                <button id="lao-btn" class="lang-button" data-lang="lao">ພາສາລາວ</button>
+                <button id="en-btn" class="lang-button" data-lang="en">English</button>
+            </div>
+            <p style="margin-top: 20px;">**ຕ້ອງເລືອກພາສາກ່ອນຈຶ່ງເລືອກໂໝດໄດ້**</p>
+        </div>
+        
+        <div id="mode-screen">
+            <h2>ເລືອກໂໝດເກມ</h2>
+            <div class="mode-section">
+                <button id="char-mode-btn" class="mode-button" data-mode="char">ໂໝດພິມຕົວອັກສອນ</button>
+                <button id="word-mode-btn" class="mode-button" data-mode="word">ໂໝດພິມຄຳສັບ</button>
+            </div>
+        </div>
+
+        <div id="result-screen">
+            <h2 id="result-message">GAME OVER / ສຳເລັດແລ້ວ</h2>
+            <div id="result-details">
+                <div class="result-item">ຄະແນນລວມ: <span id="final-score">0</span></div>
+                <div class="result-item">Level ສຸດທ້າຍ: <span id="final-level">1</span></div>
+                <div class="result-item">ພິມຖືກ: <span id="final-correct">0</span></div>
+                <div class="result-item">ພິມຜິດ: <span id="final-incorrect">0</span></div>
+                <div class="result-item">ຄວາມຖືກຕ້ອງ: <span id="final-accuracy">0%</span></div>
+            </div>
+        </div>
+
+        <div id="message"></div>
+        <div id="progress-display"></div>
+
+    </div>
+
+    <div id="stats">
+        <div class="stat-item">Level: <span id="level-display">1</span></div>
+        <div class="stat-item">ຄະແນນ: <span id="score-display">0</span></div>
+        <div class="stat-item" style="color: #D32F2F;">ຖືກໂຈມຕີ: <span id="damage-display">0</span> / 15</div>
+        <div class="stat-item" style="color: #388E3C;">ພິມຖືກ: <span id="correct-display">0</span></div>
+        <div class="stat-item" style="color: #FBC02D;">ພິມຜິດ: <span id="incorrect-display">0</span></div>
+    </div>
+    
+    <div id="controls-global">
+        <button id="back-to-menu-btn" class="control-button">🏠 ໜ້າຫຼັກ</button>
+        <button id="restart-btn" class="control-button" style="display: none;">🔄 ເລີ່ມໃໝ່</button>
+    </div>
+
     <script>
-        let form = document.querySelector("form");
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            document.querySelector("#sub").value = "ກຳລັງບັນທຶກໃສ່ Google Drive ຂອງທ່ານ...";
-            let data = new FormData(form);
-            fetch('https://script.google.com/macros/s/AKfycbzlmx1hD4fBxuhrRlvhREsmEg4qIgABm2bj7fTT_f6CC1cdHf2oVM20D8ZLRVQiAkDB/exec', {
-                method: "POST",
-                body: data
-            })
-                .then(response => alert("ການບັນທຶກສຳເລັດຮຽບຮ້ອຍແລ້ວ", location.reload()))
-                .catch(error => console.error('Error!', error.message))
-        })
-    </script>
-</body>
-<script>
-    document.addEventListener('contextmenu', event => event.preventDefault()) 
-</script>
+        /* -------------------------- */
+        /* JavaScript ສໍາລັບການຫຼິ້ນເກມ */
+        /* -------------------------- */
 
+        // ໂຄງສ້າງຂໍ້ມູນ Level
+        const charLevels = {
+            1: { lao: ['ກ', 'ຂ', 'ຄ', 'ງ', 'ຈ', 'ຊ', 'ຍ', 'ດ', 'ຕ', 'ຖ', 'ທ', 'ນ', 'ບ', 'ປ', 'ຜ', 'ຝ', 'ພ', 'ຟ', 'ມ', 'ຢ', 'ຣ', 'ລ', 'ວ', 'ສ', 'ຫ'], en: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'], speed: 1.0 },
+            // ... (Levels ອື່ນໆ)
+        };
+        const wordLevels = {
+            1: { 
+                lao: ['ສະບາຍດີ', 'ໂຮງຮຽນ', 'ຄອມພິວເຕີ', 'ໂທລະສັບ', 'ອິນເຕີເນັດ', 'ເກມ', 'ລະຫັດ', 'ພາສາ', 'ໂລກ', 'ດາວ', 
+                      'ຕົວຢ່າງ', 'ການພິມ', 'ພັດທະນາ', 'ໜ້າຈໍ', 'ຄວາມໄວ', 'ສຶກສາ', 'ຂໍ້ມູນ', 'ການສ້າງ', 'ວິໄສທັດ', 'ປະສິດທິພາບ'], 
+                en: ['hello', 'world', 'computer', 'keyboard', 'programming', 'language', 'javascript', 'html', 'coding', 'space',
+                     'typing', 'game', 'level', 'mode', 'difficulty', 'software', 'network', 'system', 'project', 'server'], 
+                speed: 1.0 
+            },
+             // ... (Levels ອື່ນໆ)
+        };
+
+        // ຕົວປ່ຽນເກມ
+        let currentLanguage = '';
+        let currentMode = ''; 
+        let currentLevelsData = charLevels; 
+        let currentLevel = 1;
+        let score = 0;
+        let damage = 0;
+        let correctHits = 0;
+        let incorrectHits = 0;
+        const maxDamage = 15;
+        let isGameOver = false;
+        let currentEnemy = null; 
+        let wordsRemaining = []; 
+        let allWordsInLevel = []; 
+        let targetWord = ''; 
+        let typedPrefix = ''; 
+
+        // DOM Elements
+        const gameContainer = document.getElementById('game-container');
+        const messageDisplay = document.getElementById('message');
+        const progressDisplay = document.getElementById('progress-display');
+        const startScreen = document.getElementById('start-screen');
+        const modeScreen = document.getElementById('mode-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const globalControls = document.getElementById('controls-global');
+        const restartBtn = document.getElementById('restart-btn');
+        const backToMenuBtn = document.getElementById('back-to-menu-btn');
+
+        // Stats Display
+        const damageDisplay = document.getElementById('damage-display');
+        const scoreDisplay = document.getElementById('score-display');
+        const correctDisplay = document.getElementById('correct-display');
+        const incorrectDisplay = document.getElementById('incorrect-display');
+        const levelDisplay = document.getElementById('level-display');
+        
+        // Audio (ຍັງຄົງເດີມ)
+        const audio = {
+            shoot: new Audio('shoot_sound.wav'), explosion: new Audio('explosion_sound.wav'), error: new Audio('error_sound.wav'),    
+            gameOver: new Audio('gameover_sound.wav'), levelUp: new Audio('level_up_sound.wav'), damage: new Audio('damage_sound.wav') 
+        };
+        function playAudio(type) {
+             if (audio[type]) { audio[type].currentTime = 0; audio[type].play().catch(e => console.log("Audio play blocked:", e)); }
+        }
+
+        // ------------------------------------
+        // ຟັງຊັນການສະແດງໜ້າຈໍ (UI FLOW CONTROL)
+        // ------------------------------------
+
+        function setScreen(screenId) {
+            startScreen.style.display = 'none';
+            modeScreen.style.display = 'none';
+            resultScreen.style.display = 'none';
+            gameContainer.style.background = '#000033'; // ພື້ນຫຼັງເກມ
+            
+            // ເຊື່ອງປຸ່ມ restart ເວັ້ນເສຍແຕ່ຢູ່ໃນ Mode/Result
+            restartBtn.style.display = 'none'; 
+            backToMenuBtn.style.display = 'inline-block';
+
+            if (screenId === 'start') {
+                startScreen.style.display = 'flex';
+                // ບໍ່ມີປຸ່ມ restart ໃນໜ້າເລືອກພາສາ
+            } else if (screenId === 'mode') {
+                modeScreen.style.display = 'flex';
+                // ໃຫ້ເຫັນປຸ່ມ restart (ກັບຄືນໄປ start-screen)
+                restartBtn.style.display = 'inline-block';
+                restartBtn.textContent = '🏠 ກັບຄືນ'; 
+            } else if (screenId === 'result') {
+                resultScreen.style.display = 'flex';
+                restartBtn.style.display = 'inline-block';
+                restartBtn.textContent = '🔄 ເລີ່ມໃໝ່'; 
+            } else if (screenId === 'game') {
+                // ເມື່ອຫຼິ້ນເກມ, ໃຫ້ປຸ່ມ restart ເຮັດວຽກເປັນການເລີ່ມໃໝ່
+                restartBtn.style.display = 'inline-block';
+                restartBtn.textContent = '🔄 ເລີ່ມໃໝ່'; 
+            }
+        }
+        
+        function backToMenu() {
+            isGameOver = true;
+            // ເຄຍສັດຕູທັງໝົດ
+            document.querySelectorAll('.enemy').forEach(e => clearInterval(parseInt(e.getAttribute('data-interval'))));
+            document.querySelectorAll('.enemy').forEach(e => e.remove()); 
+            document.querySelectorAll('.bullet').forEach(b => b.remove()); 
+
+            currentLanguage = ''; 
+            currentMode = '';
+            currentEnemy = null; 
+            messageDisplay.style.display = 'none';
+
+            setScreen('start'); 
+        }
+
+        function showModeScreen() {
+             // ໃຊ້ຄືນປຸ່ມ restart ເປັນປຸ່ມ "ກັບຄືນ"
+            restartBtn.removeEventListener('click', restartGame); 
+            restartBtn.addEventListener('click', backToMenu); 
+            
+            setScreen('mode');
+        }
+
+        function showResultScreen(message, isSuccess) {
+            setScreen('result');
+            
+            // ຜູກປຸ່ມ Restart ໃໝ່
+            restartBtn.removeEventListener('click', backToMenu); 
+            restartBtn.addEventListener('click', restartGame); 
+
+            // ສະແດງຂໍ້ຄວາມ ແລະ ລາຍລະອຽດ
+            document.getElementById('result-message').textContent = message;
+            document.getElementById('result-message').style.color = isSuccess ? '#4CAF50' : '#F44336';
+            
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-level').textContent = currentLevel;
+            document.getElementById('final-correct').textContent = correctHits;
+            document.getElementById('final-incorrect').textContent = incorrectHits;
+
+            const totalTyped = correctHits + incorrectHits;
+            const accuracy = totalTyped > 0 
+                ? ((correctHits / totalTyped) * 100).toFixed(2)
+                : 0;
+            
+            document.getElementById('final-accuracy').textContent = `${accuracy}%`;
+        }
+
+        // ------------------------------------
+        // ຟັງຊັນເກມຫຼັກ (Game Logic)
+        // ------------------------------------
+
+        function updateStats() {
+            // ... (ຍັງຄົງເດີມ)
+            damageDisplay.textContent = damage;
+            scoreDisplay.textContent = score;
+            correctDisplay.textContent = correctHits;
+            incorrectDisplay.textContent = incorrectHits;
+            levelDisplay.textContent = currentLevel;
+            
+            const totalItems = allWordsInLevel.length;
+            const remainingItems = wordsRemaining.length;
+            const completedItems = totalItems - remainingItems;
+            const progressUnit = currentMode === 'char' 
+                ? (currentLanguage === 'lao' ? 'ຕົວອັກສອນ' : 'Characters') 
+                : (currentLanguage === 'lao' ? 'ຄຳສັບ' : 'Words');
+
+            progressDisplay.textContent = `Progress: ${completedItems} / ${totalItems} ${progressUnit}`;
+        }
+        
+        // ... (renderEnemyText, moveEnemy, createBullet, hitItem, enemyAttack, takeDamage ຍັງຄົງເດີມ) ...
+        
+        // ຕ້ອງເພີ່ມ Logic ທີ່ຂາດໄປຄືນ
+        function renderEnemyText(enemy, fullText, prefix) {
+            if (currentMode === 'char') { enemy.textContent = fullText; } 
+            else {
+                const remaining = fullText.substring(prefix.length);
+                const content = `<span class="highlight">${prefix}</span>${remaining}`;
+                enemy.innerHTML = content;
+            }
+        }
+        
+        function moveEnemy(enemy) {
+            const speed = currentLevelsData[currentLevel].speed;
+            const moveInterval = 20; 
+            const speedMultiplier = speed * 1.5; 
+            const isCharMode = currentMode === 'char';
+            const playerCollisionX = document.getElementById('player').offsetWidth + document.getElementById('player').offsetLeft + (isCharMode ? 0 : 10); 
+
+            const interval = setInterval(() => {
+                if (isGameOver || !enemy.parentElement) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                let currentRight = parseFloat(enemy.style.right) || 0;
+                let newRight = currentRight + speedMultiplier; 
+                let currentX = gameContainer.offsetWidth - newRight; 
+
+                if (currentX <= playerCollisionX) { 
+                    clearInterval(interval);
+                    enemyAttack(enemy, true); 
+                    if (currentEnemy === enemy) { currentEnemy = null; targetWord = ''; typedPrefix = ''; }
+                    enemy.remove();
+                    spawnNextEnemy(); 
+                    return;
+                }
+
+                enemy.style.right = `${newRight}px`;
+                enemy.setAttribute('data-pos-x', currentX - (isCharMode ? 30 : 75)); 
+                
+            }, moveInterval);
+
+            enemy.setAttribute('data-interval', interval);
+        }
+        
+        function createBullet(targetEnemy) {
+            if (!targetEnemy || !targetEnemy.parentElement) return; 
+            playAudio('shoot');
+
+            const playerX = document.getElementById('player').offsetLeft + document.getElementById('player').offsetWidth;
+            const playerY = document.getElementById('player').offsetTop + (document.getElementById('player').offsetHeight / 2) - 2.5;
+            
+            const bullet = document.createElement('div');
+            bullet.classList.add('bullet');
+            bullet.style.top = `${playerY}px`;
+            bullet.style.left = `${playerX}px`;
+            gameContainer.appendChild(bullet);
+
+            const BULLET_SPEED = 25; 
+            const moveInterval = 10; 
+            const isWordHit = currentMode === 'word';
+
+            const bulletInterval = setInterval(() => {
+                if (isGameOver || !targetEnemy.parentElement) {
+                    clearInterval(bulletInterval);
+                    bullet.remove();
+                    return;
+                }
+
+                const targetX = parseFloat(targetEnemy.getAttribute('data-pos-x'));
+                const targetY = parseFloat(targetEnemy.getAttribute('data-pos-y'));
+                
+                let currentX = parseFloat(bullet.style.left);
+                let currentY = parseFloat(bullet.style.top);
+                
+                const deltaX = targetX - currentX;
+                const deltaY = targetY - currentY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                if (distance < BULLET_SPEED) {
+                    clearInterval(bulletInterval);
+                    bullet.remove();
+                    hitItem(targetEnemy, isWordHit);
+                    return;
+                }
+                
+                const ratio = BULLET_SPEED / distance;
+                const moveX = deltaX * ratio;
+                const moveY = deltaY * ratio;
+                
+                bullet.style.left = `${currentX + moveX}px`;
+                bullet.style.top = `${currentY + moveY}px`;
+
+            }, moveInterval);
+        }
+
+        function hitItem(enemy, isWordHit) {
+            if (!enemy || !enemy.parentElement) return; 
+            const itemHit = enemy.getAttribute('data-word');
+
+            const index = wordsRemaining.indexOf(itemHit);
+            if (index > -1) { wordsRemaining.splice(index, 1); }
+
+            playAudio('explosion'); 
+            clearInterval(parseInt(enemy.getAttribute('data-interval')));
+            
+            enemy.style.backgroundColor = '#8BC34A'; 
+            enemy.innerHTML = '💥'; 
+            score += isWordHit ? 10 * itemHit.length : 10; 
+            correctHits++;
+            
+            if (currentEnemy === enemy) { currentEnemy = null; targetWord = ''; typedPrefix = ''; }
+            
+            setTimeout(() => {
+                enemy.remove();
+                spawnNextEnemy(); 
+            }, 100);
+        }
+
+        function enemyAttack(aggressor, isOverrun = false) {
+             if (isGameOver) return;
+             takeDamage(aggressor, isOverrun); 
+
+             if (!isOverrun && aggressor) {
+                aggressor.style.backgroundColor = '#FF5252';
+                setTimeout(() => { aggressor.style.backgroundColor = '#FFCDD2'; }, 200);
+             }
+        }
+
+        function takeDamage(aggressor, isOverrun) {
+            if (isGameOver) return;
+            
+            playAudio('damage'); 
+            damage++;
+            damageDisplay.style.color = '#F44336';
+            setTimeout(() => { damageDisplay.style.color = '#D32F2F'; }, 100);
+            updateStats();
+
+            if (damage >= maxDamage) {
+                endGame(currentLanguage === 'lao' ? 'ເກມຈົບ! ທ່ານຖືກໂຈມຕີ 15 ຄັ້ງ' : 'GAME OVER! You took 15 hits', false);
+            }
+        }
+        
+        function checkLevelComplete() {
+            const maxLevel = Object.keys(currentLevelsData).length; 
+
+            if (wordsRemaining.length === 0) {
+                if (currentLevel < maxLevel) {
+                    playAudio('levelUp'); 
+                    currentLevel++;
+                    
+                    const dataSet = currentLevelsData[currentLevel][currentLanguage];
+                    allWordsInLevel = [...dataSet]; 
+                    wordsRemaining = [...dataSet]; 
+
+                    const nextLevelMsg = currentLanguage === 'lao' 
+                        ? `ຜ່ານ Level ${currentLevel - 1} ແລ້ວ! ໄປ Level ${currentLevel}` 
+                        : `Level ${currentLevel - 1} Complete! Next Level: ${currentLevel}`;
+                    
+                    messageDisplay.textContent = nextLevelMsg;
+                    messageDisplay.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        messageDisplay.style.display = 'none';
+                        spawnNextEnemy(); 
+                        updateStats();
+                    }, 3000);
+                } else {
+                    endGame(currentLanguage === 'lao' ? 'ສຳເລັດ! ທ່ານຄືຍອດວິລະຊົນໂຕຈິງ!' : 'CONGRATULATIONS! You are a true Letter Hero!', true);
+                }
+            }
+        }
+        
+        function spawnNextEnemy() {
+            if (isGameOver) return;
+            if (currentEnemy && currentEnemy.parentElement) return; 
+            
+            if (wordsRemaining.length === 0) {
+                checkLevelComplete();
+                return;
+            }
+
+            targetWord = wordsRemaining[Math.floor(Math.random() * wordsRemaining.length)];
+            typedPrefix = ''; 
+            
+            // ປັບຂະໜາດສັດຕູຕາມ Mode
+            const isCharMode = currentMode === 'char';
+            const size = isCharMode ? 60 : 'auto'; 
+            const minWidth = isCharMode ? '60px' : 'auto';
+            const height = isCharMode ? '60px' : '40px';
+            const fontSize = isCharMode ? 35 : 20; 
+            const padding = isCharMode ? '10px' : '10px 15px';
+            const borderRadius = isCharMode ? '50%' : '5px';
+            const enemyOffset = isCharMode ? 30 : 75; 
+            const startRight = isCharMode ? `-60px` : `-150px`;
+
+            const randomY = Math.max(30, Math.min(470, Math.random() * (gameContainer.clientHeight - (isCharMode ? 60 : 40)))); 
+
+            const enemy = document.createElement('div');
+            enemy.classList.add('enemy');
+            
+            enemy.style.width = size;
+            enemy.style.minWidth = minWidth;
+            enemy.style.height = height;
+            enemy.style.borderRadius = borderRadius;
+            enemy.style.fontSize = `${fontSize}px`;
+            enemy.style.padding = padding;
+            
+            renderEnemyText(enemy, targetWord, typedPrefix); 
+            
+            enemy.setAttribute('data-word', targetWord);
+            enemy.style.top = `${randomY}px`;
+            enemy.style.right = startRight;
+            
+            enemy.setAttribute('data-pos-x', gameContainer.offsetWidth - enemyOffset); 
+            enemy.setAttribute('data-pos-y', randomY + (isCharMode ? 30 : 20)); 
+
+            gameContainer.appendChild(enemy);
+            currentEnemy = enemy; 
+
+            moveEnemy(enemy);
+        }
+
+        // ------------------------------------
+        // END GAME LOGIC (ປັບປຸງ)
+        // ------------------------------------
+
+        function endGame(msg, isSuccess) {
+            playAudio('gameOver'); 
+            isGameOver = true;
+            document.querySelectorAll('.enemy').forEach(e => clearInterval(parseInt(e.getAttribute('data-interval'))));
+            
+            // ເຊື່ອງສັດຕູທັງໝົດ
+            document.querySelectorAll('.enemy').forEach(e => e.remove()); 
+            
+            showResultScreen(msg, isSuccess);
+        }
+
+        function initializeGame(lang, mode) {
+            // ປິດສຽງເມື່ອເລີ່ມເກມໃໝ່ເພື່ອຫຼີກລ້ຽງການຕິດຂັດ
+            Object.values(audio).forEach(sound => {
+                sound.muted = true;
+                sound.play().catch(e => {});
+                sound.muted = false;
+                sound.pause();
+                sound.currentTime = 0;
+            });
+            
+            currentLanguage = lang;
+            currentMode = mode;
+            currentLevelsData = (mode === 'word' ? wordLevels : charLevels);
+            
+            // Reset Stats
+            currentLevel = 1; score = 0; damage = 0; correctHits = 0; incorrectHits = 0;
+            isGameOver = false; currentEnemy = null; typedPrefix = ''; targetWord = '';
+
+            const dataSet = currentLevelsData[currentLevel][currentLanguage];
+            allWordsInLevel = [...dataSet]; 
+            wordsRemaining = [...dataSet]; 
+
+            // ເຂົ້າສູ່ໜ້າຈໍເກມ
+            setScreen('game');
+            document.querySelectorAll('.enemy').forEach(e => e.remove()); 
+            document.querySelectorAll('.bullet').forEach(b => b.remove()); 
+            messageDisplay.style.display = 'none';
+
+            updateStats();
+            spawnNextEnemy(); 
+        }
+
+        function restartGame() {
+            if (currentLanguage && currentMode) {
+                 initializeGame(currentLanguage, currentMode);
+            } else {
+                 backToMenu(); // ຖ້າບໍ່ມີ Mode ໃຫ້ກັບໄປໜ້າຫຼັກ
+            }
+        }
+
+        // ------------------------------------
+        // Event Listeners
+        // ------------------------------------
+
+        // ຂັ້ນຕອນທີ 1: ເລືອກພາສາ
+        document.querySelectorAll('.lang-button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                currentLanguage = e.target.getAttribute('data-lang'); 
+                document.querySelectorAll('.lang-button').forEach(b => b.style.border = 'none');
+                e.target.style.border = '3px solid white';
+                showModeScreen();
+            });
+        });
+        
+        // ຂັ້ນຕອນທີ 2: ເລືອກໂໝດ
+        document.querySelectorAll('.mode-button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const mode = e.target.getAttribute('data-mode');
+                initializeGame(currentLanguage, mode);
+            });
+        });
+        
+        // ປຸ່ມຄວບຄຸມ Global
+        backToMenuBtn.addEventListener('click', backToMenu);
+        restartBtn.addEventListener('click', restartGame); // ປຸ່ມນີ້ຈະປ່ຽນໜ້າທີ່ຕາມໜ້າຈໍທີ່ຢູ່
+
+        // ປຸ່ມກົດ (Keydown) - Logic ຍັງຄົງເດີມ
+        document.addEventListener('keydown', (e) => {
+            if (isGameOver || currentLanguage === '' || currentMode === '' || e.repeat) return;
+            // ... (Keydown Logic ຈາກລະຫັດກ່ອນໜ້າ) ...
+            
+            let typedChar = e.key;
+            
+            const targetEnemy = currentEnemy; 
+            if (!targetEnemy) {
+                incorrectHits++;
+                playAudio('error');
+                updateStats();
+                return;
+            }
+
+            if (currentMode === 'char') {
+                let enemyChar = targetEnemy.getAttribute('data-word');
+                let targetCharForMatch = enemyChar;
+                
+                if (currentLanguage === 'en') {
+                    targetCharForMatch = targetCharForMatch.toUpperCase();
+                    typedChar = typedChar.toUpperCase();
+                }
+                
+                if (targetCharForMatch === typedChar) {
+                    createBullet(targetEnemy); 
+                } else {
+                    incorrectHits++;
+                    playAudio('error'); 
+                    enemyAttack(targetEnemy, false); 
+                }
+            } else {
+                let charToMatch = targetWord[typedPrefix.length]; 
+                let typedCharLower = typedChar;
+                if (currentLanguage === 'en') {
+                    typedCharLower = typedChar.toLowerCase();
+                }
+
+                if (charToMatch && charToMatch === typedCharLower) {
+                    typedPrefix += charToMatch;
+                    renderEnemyText(targetEnemy, targetWord, typedPrefix);
+                    
+                    if (typedPrefix.length === targetWord.length) {
+                        targetEnemy.style.border = '3px solid #00C853';
+                        createBullet(targetEnemy); 
+                    }
+                } else {
+                    incorrectHits++;
+                    playAudio('error'); 
+                    enemyAttack(targetEnemy, false); 
+                }
+            }
+            updateStats();
+            
+        });
+        
+        // ເລີ່ມຕົ້ນ: ສະແດງໜ້າຈໍເລືອກພາສາ
+        setScreen('start');
+    </script>
+
+</body>
 </html>
