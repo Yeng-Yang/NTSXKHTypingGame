@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ຍອດວິລະຊົນນ້ອຍພິຊິດອັກສອນ - 2D (Complete Character Set)</title>
+    <title>ຍອດວິລະຊົນນ້ອຍພິຊິດອັກສອນ - 2D (ຂະຫຍາຍຈໍ + ພື້ນຫຼັງຮູບພາບ)</title>
     <style>
-        /* CSS ຍັງຄົງເດີມ... */
+        /* -------------------------- */
+        /* CSS ພື້ນຖານ ແລະ Font */
+        /* -------------------------- */
         body {
             font-family: 'Arial', sans-serif;
             display: flex;
@@ -18,27 +20,54 @@
         }
 
         #game-container {
-            width: 800px;
-            height: 500px;
+            width: 1000px; /* ຂະຫຍາຍຄວາມກວ້າງ */
+            height: 700px; /* ຂະຫຍາຍຄວາມສູງ */
             border: 5px solid #4CAF50;
-            background-color: #000033;
+            background-color: transparent; /* ຕັ້ງໃຫ້ໂປ່ງໃສເພື່ອເຫັນຮູບພາບ */
             position: relative;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            font-family: 'Times New Roman', serif;
         }
 
+        /* ******* CSS ສໍາລັບຮູບພາບພື້ນຫຼັງ (ໃຊ້ແທັກ IMG) ******* */
+        #game-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* ປັບໃຫ້ເຕັມຈໍ */
+            z-index: 1; /* ໃຫ້ຢູ່ຊັ້ນລຸ່ມສຸດ */
+        }
+        /* ************************************************* */
+
+
+        .lao-font {
+            font-family: 'Phetsarath OT', 'Saysettha OT', sans-serif !important;
+        }
+
+        .en-font {
+            font-family: 'Times New Roman', serif !important;
+        }
+
+        /* -------------------------- */
+        /* Game Elements */
+        /* -------------------------- */
         #player {
             position: absolute;
             left: 50px;
             top: 50%;
             transform: translateY(-50%);
             font-size: 30px;
-            color: #00796B;
+            color: #4DB6AC; /* ສີຟ້າອ່ອນ/ຂຽວອ່ອນ (Cyber) */
             padding: 10px;
-            background: #B2DFDB;
+            background: rgba(0, 0, 0, 0.8); /* ພື້ນຫຼັງມືດ */
             border-radius: 5px;
             font-weight: bold;
-            z-index: 5; 
+            z-index: 5; /* ຕ້ອງສູງກວ່າຮູບພາບ */
+            display: none;
+            box-shadow: 0 0 10px #4DB6AC; 
         }
 
         .enemy {
@@ -46,25 +75,24 @@
             right: 0;
             width: 60px;
             height: 60px;
-            background-color: #FFCDD2;
-            border: 2px solid #D32F2F;
+            background-color: rgba(255, 165, 0, 0.9); /* ສີສົ້ມເດັ່ນ */
+            border: 2px solid #FF8C00; 
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 35px;
             font-weight: bold;
-            color: #D32F2F;
+            color: #000000; /* ຕົວອັກສອນສີດຳເພື່ອໃຫ້ເຫັນຊັດ */
             transition: background-color 0.1s; 
-            cursor: pointer;
-            z-index: 2; 
+            z-index: 3; /* ຕ້ອງສູງກວ່າຮູບພາບ */
         }
 
         .bullet {
             position: absolute;
             width: 15px;
             height: 5px;
-            background-color: #FFC107; 
+            background-color: #FFC107; /* ສີເຫຼືອງສ່ອງແສງ */
             border-radius: 2px;
             z-index: 4; 
         }
@@ -78,9 +106,26 @@
             z-index: 4; 
         }
 
+        #progress-display {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFFF00; /* ປັບເປັນສີເຫຼືອງເພື່ອເດັ່ນຂຶ້ນເທິງພື້ນຫຼັງ */
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 10;
+            display: none;
+        }
+
+        /* -------------------------- */
+        /* Interface (Stats, Screens) */
+        /* -------------------------- */
         #stats {
-            width: 800px;
-            display: flex;
+            width: 1000px; /* ກວ້າງເທົ່າກັບ game-container */
+            display: none; 
             justify-content: space-between;
             margin-top: 15px;
             padding: 10px 0;
@@ -95,27 +140,7 @@
             text-align: center;
         }
 
-        .stat-item span {
-            font-weight: bold;
-            color: #388E3C;
-        }
-
-        #message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 40px;
-            font-weight: bold;
-            color: #F44336;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            z-index: 10;
-            display: none;
-            text-align: center;
-        }
-
+        /* Start Screen Overlay */
         #start-screen {
             position: absolute;
             width: 100%;
@@ -129,7 +154,7 @@
             color: white;
             text-align: center;
         }
-
+        
         .lang-button {
             padding: 15px 30px;
             margin: 10px;
@@ -140,51 +165,84 @@
             font-weight: bold;
         }
 
-        #lao-btn { background-color: #FFEB3B; color: #333; }
-        #en-btn { background-color: #2196F3; color: white; }
+        /* End Game Screen Overlay (ແບບສີດຳ) */
+        #end-game-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #000000; 
+            z-index: 21;
+            display: none; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        
+        #end-game-screen h2 {
+            font-size: 48px;
+            margin-bottom: 30px; 
+            color: #FF6347; 
+        }
 
-        #controls {
-            width: 800px;
-            margin-top: 15px;
+        #end-game-details {
+            margin: 20px 0;
+            padding: 30px;
+            background-color: #222222; 
+            border-radius: 10px;
+            border: 2px solid #555555;
+            text-align: left;
+            font-size: 24px;
+            color: #FFFFFF; 
+            width: 70%; 
+            max-width: 450px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #end-game-details p {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between; 
+        }
+        
+        #end-game-details .value {
+            font-weight: bold;
+            color: #FFD700; 
+        }
+        
+        #end-game-details .accuracy-value {
+             color: #FFD700; 
+        }
+
+        #end-game-buttons {
             display: flex;
             justify-content: center;
+            margin-top: 25px;
         }
         
         .control-button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            font-size: 18px;
+            padding: 15px 30px;
+            margin: 0 15px;
+            font-size: 20px;
             cursor: pointer;
             border: none;
             border-radius: 5px;
             font-weight: bold;
+            transition: background-color 0.2s;
         }
-
-        #restart-btn { background-color: #4CAF50; color: white; }
-        #exit-btn { background-color: #F44336; color: white; }
         
-        #progress-display {
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 16px;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
-            z-index: 10;
-        }
     </style>
 </head>
 <body>
 
-    <h1>ຍອດວິລະຊົນນ້ອຍພິຊິດອັກສອນ (2D Complete Character Set)</h1>
+    <h1 class="lao-font">ຍອດວິລະຊົນນ້ອຍພິຊິດອັກສອນ (2D Complete)</h1>
 
-    <div id="game-container">
+    <div id="game-container" class="lao-font">
+        <img id="game-background" src="Generated Image October 15, 2025 - 4_28PM.png" alt="Game Background" />
         <div id="player">🚀</div>
 
-        <div id="start-screen">
+        <div id="start-screen" class="lao-font">
             <h2>ເລືອກພາສາ / Choose Language</h2>
             <button id="lao-btn" class="lang-button">ພາສາລາວ</button>
             <button id="en-btn" class="lang-button">English</button>
@@ -192,12 +250,21 @@
             <p>**ຕ້ອງພິມຕົວອັກສອນທັງໝົດໃນ Level ໃຫ້ຄົບຈຶ່ງຈະຂຶ້ນ Level ໃໝ່ໄດ້!**</p>
         </div>
         
+        <div id="end-game-screen" class="lao-font">
+            <h2 id="end-game-message">ເກມຈົບ! ທ່ານຖືກໂຈມຕີ 15 ຄັ້ງ</h2>
+            <div id="end-game-details"></div>
+            <div id="end-game-buttons">
+                 <button id="restart-btn-end" class="control-button" style="background-color: #4CAF50;">🔄 ເລີ່ມເກມໃໝ່</button>
+                 <button id="exit-btn-end" class="control-button" style="background-color: #F44336;">🏠 ໜ້າຫຼັກ</button>
+            </div>
+        </div>
+        
         <div id="message"></div>
         <div id="progress-display"></div>
 
     </div>
 
-    <div id="stats">
+    <div id="stats" class="lao-font">
         <div class="stat-item">Level: <span id="level-display">1</span></div>
         <div class="stat-item">ຄະແນນ: <span id="score-display">0</span></div>
         <div class="stat-item" style="color: #D32F2F;">ຖືກໂຈມຕີ: <span id="damage-display">0</span> / 15</div>
@@ -205,31 +272,25 @@
         <div class="stat-item" style="color: #FBC02D;">ພິມຜິດ: <span id="incorrect-display">0</span></div>
     </div>
     
-    <div id="controls" style="display: none;">
-        <button id="restart-btn" class="control-button">🔄 ເລີ່ມເກມໃໝ່</button>
-        <button id="exit-btn" class="control-button">🏠 ອອກຈາກເກມ (Menu)</button>
-    </div>
-
     <script>
         /* -------------------------- */
         /* JavaScript ສໍາລັບການຫຼິ້ນເກມ */
         /* -------------------------- */
 
         // ໂຄງສ້າງຂໍ້ມູນ Level
-        // 'count' ບໍ່ຖືກນຳໃຊ້ໃນ Mode ນີ້, ແຕ່ 'speed' ແລະ 'lao'/'en' ຍັງຖືກນຳໃຊ້
         const levels = {
             1: { lao: ['ກ', 'ຂ', 'ຄ', 'ງ', 'ຈ'], en: ['A', 'B', 'C', 'D', 'E'], speed: 1.0 },
             2: { lao: ['ຊ', 'ຍ', 'ດ', 'ຕ', 'ຖ'], en: ['F', 'G', 'H', 'I', 'J'], speed: 1.2 },
             3: { lao: ['ທ', 'ນ', 'ບ', 'ປ', 'ຜ'], en: ['K', 'L', 'M', 'N', 'O'], speed: 1.4 },
             4: { lao: ['ຝ', 'ພ', 'ຟ', 'ມ', 'ຢ'], en: ['P', 'Q', 'R', 'S', 'T'], speed: 1.6 },
             5: { lao: ['ຣ', 'ລ', 'ວ', 'ສ', 'ຫ'], en: ['U', 'V', 'W', 'X', 'Y', 'Z'], speed: 1.8 },
-            6: { lao: ['ກ', 'ຂ', 'ຄ', 'ງ', 'ຈ', 'ອ', 'ຮ'], en: ['A', 'E', 'I', 'O', 'U'], speed: 2.0 }, 
-            7: { lao: ['ກ', 'ະ', 'າ', 'ຂ', 'ເ', 'ແ'], en: ['a', 'b', 'c', 'd', 'e'], speed: 2.2 },
-            8: { lao: ['ໂ', 'ໃ', 'ໄ', 'ດ', 'ຕ', 'ຖ'], en: ['f', 'g', 'h', 'i', 'j'], speed: 2.4 },
-            9: { lao: ['ຽ', 'ຶ', 'ື', 'ຸ', 'ູ', 'ທ'], en: ['k', 'l', 'm', 'n', 'o', 'p'], speed: 2.6 },
+            6: { lao: ['ອ', 'ຮ', 'ະ', 'າ', 'ິ'], en: ['A', 'E', 'I', 'O', 'U'], speed: 2.0 }, 
+            7: { lao: ['ີ', 'ຶ', 'ື', 'ຸ', 'ູ', 'ເ'], en: ['a', 'b', 'c', 'd', 'e'], speed: 2.2 },
+            8: { lao: ['ແ', 'ໂ', 'ໃ', 'ໄ', 'ໍ', 'ຽ'], en: ['f', 'g', 'h', 'i', 'j'], speed: 2.4 },
+            9: { lao: ['່', '້', '໊', '໋', 'ໜ', 'ຍ'], en: ['k', 'l', 'm', 'n', 'o', 'p'], speed: 2.6 },
             10: { lao: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], en: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], speed: 2.8 },
-            11: { lao: ['ກ່', 'ຂ້', 'ຄ໊', 'ງ໋', 'ຈ'], en: ['A', 'a', 'B', 'b', 'C', 'c', 'D', 'd'], speed: 3.0 },
-            12: { lao: ['ກ', 'າ', '່', '1', 'ຂ', 'ຶ', '້', '2'], en: ['A', 'a', '1', 'B', 'b', '2'], speed: 3.2 }
+            11: { lao: ['ກ', 'ະ', '1', 'ຂ', 'ຶ', '2', 'ຄ', 'ເ', '3'], en: ['A', 'a', '1', 'B', 'b', '2'], speed: 3.0 },
+            12: { lao: ['ກ', 'າ', '່', '1', 'ຂ', 'ຶ', '້', '2'], en: ['A', 'a', '1', 'B', 'b', '2', 'C', 'c', '3'], speed: 3.2 }
         };
 
         // ຕົວປ່ຽນເກມ
@@ -243,15 +304,19 @@
         let isGameOver = false;
         let currentEnemy = null; 
         
-        // **ຕົວປ່ຽນໃໝ່ສຳລັບ Logic ໃໝ່**
-        let charactersRemaining = []; // ຕົວອັກສອນທີ່ຍັງເຫຼືອໃນ Level
-        let allCharactersInLevel = []; // ຕົວອັກສອນທັງໝົດໃນ Level
+        let charactersRemaining = []; 
+        let allCharactersInLevel = []; 
 
         const gameContainer = document.getElementById('game-container');
         const player = document.getElementById('player');
         const messageDisplay = document.getElementById('message');
-        const controlsDiv = document.getElementById('controls');
         const progressDisplay = document.getElementById('progress-display');
+        const h1Title = document.querySelector('h1');
+        
+        // Elements ຂອງໜ້າຈໍສະຫຼຸບຜົນ
+        const endGameScreen = document.getElementById('end-game-screen');
+        const endGameMessage = document.getElementById('end-game-message');
+        const endGameDetails = document.getElementById('end-game-details'); 
         
         // Displays
         const damageDisplay = document.getElementById('damage-display');
@@ -262,15 +327,15 @@
         
         // Buttons
         const startScreen = document.getElementById('start-screen');
-        const restartBtn = document.getElementById('restart-btn');
-        const exitBtn = document.getElementById('exit-btn');
+        const restartBtnEnd = document.getElementById('restart-btn-end');
+        const exitBtnEnd = document.getElementById('exit-btn-end');
         
         // ===================================
-        // ການຈັດການສຽງ
+        // ການຈັດການສຽງ (ຕ້ອງໄດ້ເພີ່ມໄຟລ໌ສຽງເຫຼົ່ານີ້ໃສ່ Folder)
         // ===================================
 
         const audio = {
-            shoot: new Audio('shoot_sound.wav'),        
+            shoot: new Audio('shoot_sound.wav'),      
             explosion: new Audio('explosion_sound.wav'), 
             error: new Audio('error_sound.wav'),    
             gameOver: new Audio('gameover_sound.wav'), 
@@ -284,6 +349,25 @@
                 audio[type].play().catch(e => console.log("Audio play blocked:", e)); 
             }
         }
+        
+        // ຟັງຊັນອັບເດດ Font ຂອງ Game Container
+        function updateGameFont(lang) {
+            const elementsToUpdate = [gameContainer, startScreen, messageDisplay, h1Title, endGameScreen];
+            
+            elementsToUpdate.forEach(el => {
+                el.classList.remove('lao-font', 'en-font');
+                if (lang === 'lao') {
+                    el.classList.add('lao-font');
+                } else {
+                    el.classList.add('en-font');
+                }
+            });
+            
+            document.querySelectorAll('.enemy').forEach(enemy => {
+                 enemy.classList.remove('lao-font', 'en-font');
+                 enemy.classList.add(lang === 'lao' ? 'lao-font' : 'en-font');
+            });
+        }
 
         // ຟັງຊັນການອັບເດດສະຖິຕິ
         function updateStats() {
@@ -293,7 +377,6 @@
             incorrectDisplay.textContent = incorrectHits;
             levelDisplay.textContent = currentLevel;
             
-            // ອັບເດດ Progress ຂອງ Level
             const totalChars = allCharactersInLevel.length;
             const completedChars = totalChars - charactersRemaining.length;
             progressDisplay.textContent = currentLanguage === 'lao' 
@@ -306,18 +389,19 @@
             if (isGameOver) return;
             if (currentEnemy && currentEnemy.parentElement) return; 
             
-            // NEW: ຖ້າບໍ່ມີຕົວອັກສອນເຫຼືອແລ້ວ, ໃຫ້ຂຶ້ນ Level
             if (charactersRemaining.length === 0) {
                 checkLevelComplete();
                 return;
             }
 
-            // NEW: ເລືອກຕົວອັກສອນສະເພາະຈາກທີ່ຍັງເຫຼືອ
             const randomChar = charactersRemaining[Math.floor(Math.random() * charactersRemaining.length)];
-            const randomY = Math.max(30, Math.min(470, Math.random() * (gameContainer.clientHeight - 60))); 
+            const randomY = Math.max(30, Math.min(670, Math.random() * (gameContainer.clientHeight - 60))); 
 
             const enemy = document.createElement('div');
             enemy.classList.add('enemy');
+            
+            enemy.classList.add(currentLanguage === 'lao' ? 'lao-font' : 'en-font');
+
             enemy.textContent = randomChar;
             enemy.setAttribute('data-char', randomChar);
             enemy.style.top = `${randomY}px`;
@@ -332,7 +416,7 @@
             moveEnemy(enemy);
         }
 
-        // ຟັງຊັນການເຄື່ອນທີ່ຂອງສັດຕູ (2D)
+        // ຟັງຊັນການເຄື່ອນທີ່ຂອງສັດຕູ
         function moveEnemy(enemy) {
             const speed = levels[currentLevel].speed;
             const moveInterval = 20; 
@@ -370,7 +454,7 @@
             enemy.setAttribute('data-interval', interval);
         }
         
-        // ຟັງຊັນສ້າງ ແລະ ເຄື່ອນທີ່ລູກປືນຜູ້ຫຼິ້ນ (Visible Bullet + Guaranteed Hit)
+        // ຟັງຊັນສ້າງ ແລະ ເຄື່ອນທີ່ລູກປືນ
         function createBullet(targetEnemy) {
             if (!targetEnemy || !targetEnemy.parentElement) return; 
             
@@ -422,7 +506,7 @@
             }, moveInterval);
         }
         
-        // ຟັງຊັນສັດຕູໂຈມຕີ (ເມື່ອພິມຜິດ ຫຼື ເຂົ້າຮອດຕົວເຮົາ)
+        // ຟັງຊັນສັດຕູໂຈມຕີ
         function enemyAttack(aggressor, isOverrun = false) {
              if (isGameOver) return;
              
@@ -481,14 +565,14 @@
              }, moveInterval);
              
              if (!isOverrun) {
-                aggressor.style.backgroundColor = '#FF5252';
-                setTimeout(() => {
-                    aggressor.style.backgroundColor = '#FFCDD2';
-                }, 200);
+                 aggressor.style.backgroundColor = '#FF5252';
+                 setTimeout(() => {
+                     aggressor.style.backgroundColor = 'rgba(255, 165, 0, 0.9)'; 
+                 }, 200);
              }
         }
 
-        // ຟັງຊັນຖືກໂຈມຕີ (Take Damage - ເອີ້ນເມື່ອລູກປືນສັດຕູຊົນ)
+        // ຟັງຊັນຖືກໂຈມຕີ
         function takeDamage(aggressor, isOverrun) {
             if (isGameOver) return;
             
@@ -506,13 +590,12 @@
             }
         }
         
-        // ຟັງຊັນຍິງຖືກ (Hit)
+        // ຟັງຊັນຍິງຖືກ
         function hitEnemy(enemy) {
             if (!enemy || !enemy.parentElement) return; 
             
             const charHit = enemy.getAttribute('data-char');
 
-            // NEW: ເອົາຕົວອັກສອນທີ່ພິມຖືກອອກຈາກລາຍຊື່ທີ່ຍັງເຫຼືອ
             const index = charactersRemaining.indexOf(charHit);
             if (index > -1) {
                 charactersRemaining.splice(index, 1);
@@ -537,7 +620,7 @@
             }, 100);
         }
 
-        // ຟັງຊັນກວດສອບ Level (NEW: ກວດເບິ່ງ CharactersRemaining)
+        // ຟັງຊັນກວດສອບ Level
         function checkLevelComplete() {
             if (charactersRemaining.length === 0) {
                 if (currentLevel < 12) {
@@ -545,7 +628,6 @@
                     
                     currentLevel++;
                     
-                    // NEW: ໂຫຼດຕົວອັກສອນໃໝ່ສຳລັບ Level ໃໝ່
                     const charSet = levels[currentLevel][currentLanguage];
                     allCharactersInLevel = [...charSet]; 
                     charactersRemaining = [...charSet]; 
@@ -568,15 +650,26 @@
             }
         }
 
-        // ຟັງຊັນຈັດການປຸ່ມກົດ
+        // ຟັງຊັນຈັດການປຸ່ມກົດ (ແກ້ໄຂບັນຫາຕົວ ວ)
         document.addEventListener('keydown', (e) => {
             if (isGameOver || currentLanguage === '') return;
 
             let typedChar = e.key;
             
+            const nonTypingKeys = ['Shift', 'Control', 'Alt', 'Meta', 'Enter', 'Tab', 'CapsLock', 'Escape', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+            if (nonTypingKeys.includes(e.key) || e.key.length > 1 && !e.key.startsWith('U+')) {
+                return; 
+            }
+
+            // LOGIC FOR LAO: ແປງຕົວອັກສອນທີ່ມັກພົບບັນຫາ (ເຊັ່ນ: v = ວ)
+            if (currentLanguage === 'lao') {
+                if (e.key === 'v') {
+                    typedChar = 'ວ';
+                } 
+            }
+            
             // ຈັດການຕົວອັກສອນພາສາອັງກິດໃຫຍ່/ນ້ອຍ
             if (currentLanguage === 'en') {
-                 // ຖ້າເປັນໂຕອັກສອນ, ປ່ຽນໃຫ້ກົງກັບໂຕທີ່ຢູ່ໃນ charactersRemaining (ເຊັ່ນ: A ຍິງຖືກ a, ຫຼື a ຍິງຖືກ A)
                  typedChar = typedChar.toUpperCase();
             }
             
@@ -590,18 +683,14 @@
                     targetCharForMatch = targetCharForMatch.toUpperCase();
                 }
                 
-                // NEW: ປຽບທຽບຕົວອັກສອນທີ່ພິມກັບຕົວອັກສອນເປົ້າໝາຍ (ທີ່ປ່ຽນເປັນໂຕໃຫຍ່ແລ້ວຖ້າເປັນ EN)
                 if (targetCharForMatch === typedChar) {
-                    // ພິມຖືກ: ຍິງປືນ
                     createBullet(targetEnemy); 
                 } else {
-                    // ພິມຜິດ:
                     incorrectHits++;
                     playAudio('error'); 
                     enemyAttack(targetEnemy, false); 
                 }
             } else {
-                // ບໍ່ມີສັດຕູ
                 incorrectHits++;
                 playAudio('error');
             }
@@ -609,44 +698,93 @@
         });
 
 
-        // ຟັງຊັນສິ້ນສຸດເກມ
+        // ຟັງຊັນສິ້ນສຸດເກມ (ສະແດງໜ້າຈໍສະຫຼຸບ Overlay)
         function endGame(msg) {
             playAudio('gameOver'); 
             
             isGameOver = true;
-            document.querySelectorAll('.enemy').forEach(e => clearInterval(parseInt(e.getAttribute('data-interval'))));
             
-            messageDisplay.textContent = msg;
-            messageDisplay.style.display = 'block';
-            messageDisplay.style.color = '#F44336';
+            // ຢຸດ ແລະ ລຶບສັດຕູ/ລູກປືນທັງໝົດ
+            document.querySelectorAll('.enemy').forEach(e => {
+                clearInterval(parseInt(e.getAttribute('data-interval')));
+                e.remove(); 
+            });
+            document.querySelectorAll('.bullet').forEach(b => b.remove()); 
+            document.querySelectorAll('.enemy-bullet').forEach(b => b.remove()); 
+            currentEnemy = null; 
             
-            controlsDiv.style.display = 'flex';
+            // 1. ຕັ້ງຂໍ້ຄວາມຈົບເກມ
+            endGameMessage.textContent = msg;
+            
+            // 2. ຄິດໄລ່ຄວາມຖືກຕ້ອງ
+            const totalAttempts = correctHits + incorrectHits;
+            const accuracy = totalAttempts > 0 ? ((correctHits / totalAttempts) * 100).toFixed(2) : '0.00'; 
+            
+            // 3. ສ້າງລາຍລະອຽດສະຖິຕິ (ແບບສີດຳ)
+            const detailsHtml = currentLanguage === 'lao' ? `
+                <p>ຄະແນນລວມ: <span class="value">${score}</span></p>
+                <p>Level ສຸດທ້າຍ: <span class="value">${currentLevel}</span></p>
+                <p>ພິມຖືກ: <span class="value">${correctHits}</span></p>
+                <p>ພິມຜິດ: <span class="value">${incorrectHits}</span></p>
+                <p>ຖືກໂຈມຕີ: <span class="value">${damage}</span></p>
+                <p>ຄວາມຖືກຕ້ອງ: <span class="accuracy-value">${accuracy}%</span></p>
+            ` : `
+                <p>Total Score: <span class="value">${score}</span></p>
+                <p>Max Level: <span class="value">${currentLevel}</span></p>
+                <p>Correct Hits: <span class="value">${correctHits}</span></p>
+                <p>Incorrect Hits: <span class="value">${incorrectHits}</span></p>
+                <p>Damage Taken: <span class="value">${damage}</span></p>
+                <p>Accuracy: <span class="accuracy-value">${accuracy}%</span></p>
+            `;
+
+            endGameDetails.innerHTML = detailsHtml;
+            
+            // 4. ເຊື່ອງ Elements ຂອງເກມ ແລະ ສະແດງໜ້າຈໍຈົບເກມ
+            player.style.display = 'none'; 
+            document.getElementById('stats').style.display = 'none'; 
+            progressDisplay.style.display = 'none';
+            messageDisplay.style.display = 'none';
+            
+            updateGameFont(currentLanguage); 
+            endGameScreen.style.display = 'flex'; 
         }
         
         function restartGame() {
+            // ເຊື່ອງໜ້າຈໍຈົບເກມ ແລະ ສະແດງ Elements ຂອງເກມ
+            endGameScreen.style.display = 'none';
+            player.style.display = 'block'; 
+            document.getElementById('stats').style.display = 'flex';
+            progressDisplay.style.display = 'block';
+
             initializeGame(currentLanguage);
         }
         
         function exitToMenu() {
             isGameOver = true;
-            document.querySelectorAll('.enemy').forEach(e => clearInterval(parseInt(e.getAttribute('data-interval'))));
             
-            document.querySelectorAll('.enemy').forEach(e => e.remove()); 
+            document.querySelectorAll('.enemy').forEach(e => { clearInterval(parseInt(e.getAttribute('data-interval'))); e.remove(); });
             document.querySelectorAll('.bullet').forEach(b => b.remove()); 
             document.querySelectorAll('.enemy-bullet').forEach(b => b.remove()); 
             
-            controlsDiv.style.display = 'none';
+            player.style.display = 'none';
+            document.getElementById('stats').style.display = 'none'; 
+            progressDisplay.style.display = 'none';
             messageDisplay.style.display = 'none';
+            endGameScreen.style.display = 'none';
+            
+            // ສະແດງໜ້າຫຼັກ
             startScreen.style.display = 'flex';
             
             currentLanguage = ''; 
             currentEnemy = null; 
+            
+            updateGameFont('lao'); 
         }
 
 
-        // ຟັງຊັນເລີ່ມເກມ (ປັບປຸງການໂຫຼດຕົວອັກສອນ)
+        // ຟັງຊັນເລີ່ມເກມ
         function initializeGame(lang) {
-            // **ການແກ້ໄຂບັນຫາສຽງ**
+            // ຕ້ອງມີການພົວພັນກັບໜ້າຈໍກ່ອນເພື່ອໃຫ້ສຽງເຮັດວຽກ
             Object.values(audio).forEach(sound => {
                 sound.muted = true;
                 sound.play().catch(e => console.log("Silent play blocked:", e));
@@ -664,16 +802,20 @@
             isGameOver = false;
             currentEnemy = null;
             
-            // NEW: ໂຫຼດຕົວອັກສອນຂອງ Level 1
+            updateGameFont(lang);
+            
             const charSet = levels[currentLevel][currentLanguage];
             allCharactersInLevel = [...charSet]; 
-            charactersRemaining = [...charSet]; // ສຳເນົາລາຍຊື່ຕົວອັກສອນທັງໝົດ
+            charactersRemaining = [...charSet]; 
 
             startScreen.style.display = 'none';
-            controlsDiv.style.display = 'none';
+            endGameScreen.style.display = 'none'; 
+            
+            // ສະແດງ Elements ຂອງເກມ
+            player.style.display = 'block';
+            document.getElementById('stats').style.display = 'flex'; 
+            progressDisplay.style.display = 'block';
             document.querySelectorAll('.enemy').forEach(e => e.remove()); 
-            document.querySelectorAll('.bullet').forEach(b => b.remove()); 
-            document.querySelectorAll('.enemy-bullet').forEach(b => b.remove()); 
             messageDisplay.style.display = 'none';
 
             updateStats();
@@ -684,11 +826,14 @@
         document.getElementById('lao-btn').addEventListener('click', () => initializeGame('lao'));
         document.getElementById('en-btn').addEventListener('click', () => initializeGame('en'));
         
-        // ຜູກປຸ່ມຄວບຄຸມ
-        restartBtn.addEventListener('click', restartGame);
-        exitBtn.addEventListener('click', exitToMenu);
+        // ຜູກປຸ່ມຄວບຄຸມໃນໜ້າຈໍຈົບເກມ
+        restartBtnEnd.addEventListener('click', restartGame);
+        exitBtnEnd.addEventListener('click', exitToMenu);
+        
+        // ເມື່ອໂຫຼດໜ້າຈໍ, ໃຫ້ຕັ້ງ Font ເບື້ອງຕົ້ນ
+        updateGameFont('lao');
+        document.getElementById('stats').style.display = 'none'; 
 
     </script>
-
 </body>
 </html>
