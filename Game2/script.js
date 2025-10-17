@@ -26,6 +26,7 @@ const sounds = {
     shoot: new Audio('sounds/shoot.wav'),
     explosion: new Audio('sounds/explosion.wav'),
     gameOver: new Audio('sounds/game_over.wav'),
+    levelUp: new Audio('sounds/level_up.wav'), // ເພີ່ມສຽງ Level Up
     hit: new Audio('sounds/hit.wav'),
     backgroundMusic: new Audio('sounds/background.mp3') // ເພີ່ມສຽງດົນຕີປະກອບ
 };
@@ -41,7 +42,10 @@ const translations = {
         gameOverTitle: "ການແຂ່ງຂັນສິ້ນສຸດ!",
         restartButton: "ຫຼິ້ນໃໝ່",
         playerName: "ທ່ານ",
-        scoreUnit: "ຄະແນນ",
+        scoreUnit: "ຄະແນນ", // Score unit
+        typedChars: "ຕົວອັກສອນທີ່ພິມ", // Typed characters
+        mistakes: "ພິມຜິດ", // Mistakes
+        accuracy: "ຄວາມແມ່ນຍຳ", // Accuracy
         backButton: "ກັບຄືນ" // ຄຳແປໃໝ່
     },
     en: {
@@ -54,6 +58,9 @@ const translations = {
         restartButton: "Restart",
         playerName: "You",
         scoreUnit: "Points",
+        typedChars: "Typed Chars",
+        mistakes: "Mistakes",
+        accuracy: "Accuracy",
         backButton: "Back" // ຄຳແປໃໝ່
     }
 };
@@ -67,9 +74,24 @@ function setLanguage(lang) {
             el.textContent = translations[lang][key];
         }
     });
+    // ເພີ່ມ class ໃສ່ body ເພື່ອປ່ຽນ font ຕາມພາສາ
+    document.body.classList.remove('lang-lo', 'lang-en');
+    document.body.classList.add(`lang-${lang}`);
 }
 
-let players, enemies, bullets, enemyBullets, explosions;
+// --- ການຕັ້ງຄ່າລະດັບຄວາມຍາກ ---
+const MAX_LEVELS = 15;
+const difficultySettings = {};
+for (let i = 1; i <= MAX_LEVELS; i++) {
+    difficultySettings[i] = {
+        enemySpeed: 0.5 + (i - 1) * 0.07, // ຄວາມໄວເພີ່ມຂຶ້ນເທື່ອລະໜ້ອຍ
+    };
+}
+
+const SCORE_PER_LEVEL = 350; // ຕ້ອງການ 350 ຄະແນນ (35 ຕົວ) ເພື່ອອັບລະດັບ
+let currentLevel = 1;
+
+let players, enemies, bullets, enemyBullets, explosions, levelUpMessage;
 let isGameOver;
 let humanPlayer; // ເກັບຜູ້ຫຼິ້ນທີ່ເປັນຄົນ
 let musicStarted = false; // ເພີ່ມຕົວປ່ຽນເພື່ອຕິດຕາມວ່າດົນຕີເລີ່ມຫຼິ້ນແລ້ວບໍ່
@@ -86,6 +108,8 @@ function setupGame() {
         isAI: false,
         score: 0,
         health: 20,
+        mistakes: 0, // ເພີ່ມຕົວນັບການພິມຜິດ
+        totalTyped: 0, // ເພີ່ມຕົວນັບການພິມທັງໝົດ
     };
 
     players = [humanPlayer];
@@ -95,6 +119,8 @@ function setupGame() {
     enemyBullets = [];
     explosions = [];
     isGameOver = false;
+    levelUpMessage = null; // ຣີເຊັດຂໍ້ຄວາມ Level Up
+    currentLevel = 1; // ຣີເຊັດລະດັບເມື່ອເລີ່ມເກມໃໝ່
 
     // --- ອັບເດດໜ້າຈໍສະແດງຜົນ ---
     scoreEl.textContent = humanPlayer.score;
@@ -113,11 +139,12 @@ function spawnWave() {
     for (let i = 0; i < waveSize; i++) {
         const x = (screenThird * i) + (Math.random() * (screenThird - 40)) + 20;
         const letter = activeAlphabet[Math.floor(Math.random() * activeAlphabet.length)];
-        const speed = 0.5;
+        const speed = difficultySettings[currentLevel].enemySpeed; // ປັບຄວາມໄວຕາມລະດັບ
 
         enemies.push({
             x: x, y: -30, letter: letter, speed: speed,
-            size: 30, color: '#f0f6fc'
+            size: 30, color: '#f0f6fc',
+            lastShotTime: Date.now() // ເກັບເວລາທີ່ຍິງລ່າສຸດ
         });
     }
 }
@@ -257,11 +284,26 @@ function draw() {
             ctx.fill();
         }
     });
+
+    // ແຕ້ມຂໍ້ຄວາມ Level Up
+    if (levelUpMessage && levelUpMessage.alpha > 0) {
+        ctx.save();
+        ctx.globalAlpha = levelUpMessage.alpha;
+        ctx.fillStyle = '#3fb950'; // ສີຂຽວ
+        ctx.font = "bold 48px 'Phetsarath OT', 'Times New Roman', serif";
+        ctx.textAlign = 'center';
+        ctx.fillText(levelUpMessage.text, canvas.width / 2, canvas.height / 2);
+        ctx.restore();
+        levelUpMessage.alpha -= 0.01; // ເຮັດໃຫ້ຂໍ້ຄວາມຈາງລົງ
+    }
+
     // ແຕ້ມ ແລະ ອັບເດດສັດຕູ
     enemies.forEach((enemy, enemyIndex) => {
         enemy.y += enemy.speed;
         ctx.fillStyle = enemy.color;
-        ctx.font = `${enemy.size}px 'Phetsarath OT'`;
+        // ປ່ຽນ font ຂອງສັດຕູຕາມພາສາທີ່ເລືອກ
+        const enemyFontFamily = (activeAlphabet === LAO_ALPHABET) ? 'Phetsarath OT' : 'Times New Roman';
+        ctx.font = `${enemy.size}px '${enemyFontFamily}'`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(enemy.letter, enemy.x, enemy.y);
@@ -280,6 +322,7 @@ function draw() {
                     bullet.owner.score += 10;
                     if (!bullet.owner.isAI) {
                         scoreEl.textContent = bullet.owner.score;
+                        checkLevelUp(bullet.owner.score); // ກວດສອບການອັບລະດັບ
                     }
                 }
                 enemies.splice(enemyIndex, 1);
@@ -302,6 +345,18 @@ function playSound(sound) {
             // ປ້ອງກັນ error ຖ້າ browser ບໍ່ອະນຸຍາດໃຫ້ຫຼິ້ນສຽງ
             console.warn("Audio play was prevented:", error);
         });
+    }
+}
+
+// --- ຟັງຊັນກວດສອບການອັບລະດັບ ---
+function checkLevelUp(score) {
+    const newLevel = Math.floor(score / SCORE_PER_LEVEL) + 1;
+    if (newLevel > currentLevel && newLevel <= MAX_LEVELS) {
+        currentLevel = newLevel;
+        console.log(`Level Up! Reached Level ${currentLevel}`);
+        playSound(sounds.levelUp);
+        // ສ້າງຂໍ້ຄວາມແຈ້ງເຕືອນ
+        levelUpMessage = { text: `Level ${currentLevel}!`, alpha: 1.0 };
     }
 }
 
@@ -363,6 +418,7 @@ window.addEventListener('keydown', (e) => {
         });
     } else if (key.length === 1 && activeAlphabet.includes(key)) {
         // ຖ້າພິມຜິດ (ຕົວອັກສອນມີໃນພາສາລາວ ແຕ່ບໍ່ມີສັດຕູ)
+        humanPlayer.mistakes++;
         // ໃຫ້ສັດຕູໂຕທຳອິດໃນໜ້າຈໍຍິງໃສ່ເຮົາ
         if (enemies.length > 0) {
             enemyShoot(enemies[0], humanPlayer);
@@ -383,11 +439,25 @@ function endGame() {
 
     // ສ້າງ HTML ສຳລັບກະດານຈັດອັນດັບ
     leaderboardEl.innerHTML = ''; // ລ້າງຂໍ້ມູນເກົ່າ
-    humanPlayer.name = translations[currentLang].playerName; // ຕັ້ງຊື່ຜູ້ຫຼິ້ນຕາມພາສາ
+    const typedChars = Math.floor(humanPlayer.score / 10);
+    const accuracy = typedChars > 0 ? ((typedChars / (typedChars + humanPlayer.mistakes)) * 100).toFixed(1) : "0.0";
+
+    // ສ້າງລາຍລະອຽດສະຖິຕິ
+    const statsDetails = `
+        <div class="game-stats">
+            <div>${translations[currentLang].typedChars}: ${typedChars}</div>
+            <div>${translations[currentLang].mistakes}: ${humanPlayer.mistakes}</div>
+            <div>${translations[currentLang].accuracy}: ${accuracy}%</div>
+        </div>
+    `;
+    leaderboardEl.innerHTML += statsDetails;
+
+    // ສ້າງກະດານຄະແນນ
     players.forEach((player, index) => {
         const rank = index + 1;
         const entry = document.createElement('div');
         entry.className = `leaderboard-entry rank-${rank}`;
+        player.name = translations[currentLang].playerName; // ຕັ້ງຊື່ຜູ້ຫຼິ້ນຕາມພາສາ
         entry.innerHTML = `<span class="rank">#${rank}</span><span class="name">${player.name}</span><span class="score">${player.score} ${translations[currentLang].scoreUnit}</span>`;
         leaderboardEl.appendChild(entry);
     });
