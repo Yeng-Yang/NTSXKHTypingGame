@@ -1,0 +1,205 @@
+body {
+    background-color: #0d1117;
+    min-height: 100vh;
+    color: #c9d1d9;
+    font-family: 'Phetsarath OT', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #58a6ff;
+    margin-bottom: 30px;
+}
+
+/* Start Screen Styles */
+#start-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#language-selector {
+    margin-bottom: 30px;
+}
+
+#language-selector p {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+#language-selector button {
+    padding: 10px 20px;
+    font-size: 1.1em;
+    color: #c9d1d9;
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0 5px;
+    font-family: 'Phetsarath OT', sans-serif;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+#language-selector button:hover {
+    background-color: #30363d;
+}
+
+#language-selector button.active {
+    background-color: #238636;
+    border-color: #2ea043;
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Login & Lobby Styles */
+#login-screen, #lobby-screen {
+    background-color: #161b22;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    width: 400px;
+    text-align: center;
+}
+
+#login-screen h2, #lobby-screen h2 {
+    margin-top: 0;
+    color: #58a6ff;
+}
+
+#player-name-input {
+    width: 80%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    border-radius: 6px;
+    font-size: 1em;
+}
+
+#start-game-button, #login-button, #ready-button, #start-solo-button, #back-to-lobby-button, #restart-button {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    color: white;
+    background-color: #238636;
+    border: 1px solid #2ea043;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#start-game-button:hover, #login-button:hover, #ready-button:hover, #start-solo-button:hover, #back-to-lobby-button:hover, #restart-button:hover {
+    background-color: #2ea043;
+}
+
+#player-list {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.player-item {
+    background-color: #0d1117;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-item .status {
+    color: #f85149; /* Not Ready */
+}
+
+.player-item.ready .status {
+    color: #3fb950; /* Ready */
+}
+
+#game-container {
+    position: relative;
+    border: 2px solid #30363d;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    background-color: #010409;
+}
+
+#hud {
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    width: 600px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#game-over-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+#game-over-screen.hidden {
+    display: none;
+}
+
+#game-over-screen h2 {
+    font-size: 3em;
+    margin: 0;
+    color: #f85149;
+}
+
+#leaderboard {
+    width: 80%;
+    margin-top: 20px;
+    font-size: 1.2em;
+}
+
+.leaderboard-entry {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.leaderboard-entry.rank-1 { background-color: #a67c00; } /* Gold */
+.leaderboard-entry.rank-2 { background-color: #b4b4b4; } /* Silver */
+.leaderboard-entry.rank-3 { background-color: #9b5c2c; } /* Bronze */
+
+.leaderboard-entry .rank {
+    font-weight: bold;
+    margin-right: 15px;
+}
+.leaderboard-entry .name {
+    flex-grow: 1;
+}
+
+#game-over-screen p {
+    font-size: 1.5em;
+}
+
+#ready-button.ready {
+    background-color: #f85149;
+    border-color: #da3633;
+}

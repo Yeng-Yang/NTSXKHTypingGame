@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເກມພິມຍິງຕົວອັກສອນ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <h1 data-lang="title">ເກມພິມຍິງຕົວອັກສອນ</h1>
+        <div id="language-selector">
+            <p data-lang="selectLanguage">ເລືອກພາສາ:</p>
+            <button data-lang-select="lo" class="active">ລາວ</button>
+            <button data-lang-select="en">English</button>
+        </div>
+        <button id="start-game-button" data-lang="startButton">ເລີ່ມເກມ</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden">
+        <div id="game-container">
+            <canvas id="gameCanvas"></canvas>
+            <div id="game-over-screen" class="hidden">
+                <h2 data-lang="gameOverTitle">ການແຂ່ງຂັນສິ້ນສຸດ!</h2>
+                <div id="leaderboard"></div>
+                <button id="restart-button" data-lang="restartButton">ຫຼິ້ນໃໝ່</button>
+            </div>
+        </div>
+        <div id="hud">
+            <span><span data-lang="scoreLabel">ຄະແນນ</span>: <span id="score">0</span></span>
+            <span><span data-lang="healthLabel">ພະລັງຊີວິດ</span>: <span id="health">20</span></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
