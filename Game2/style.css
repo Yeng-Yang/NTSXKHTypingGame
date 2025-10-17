@@ -86,7 +86,7 @@ h1 {
     font-size: 1em;
 }
 
-#start-game-button, #login-button, #ready-button, #start-solo-button, #back-to-lobby-button, #restart-button {
+#start-game-button, #login-button, #ready-button, #start-solo-button, #back-to-lobby-button, #restart-button, #back-to-menu-button {
     padding: 10px 20px;
     font-size: 1.2em;
     color: white;
@@ -96,7 +96,7 @@ h1 {
     cursor: pointer;
 }
 
-#start-game-button:hover, #login-button:hover, #ready-button:hover, #start-solo-button:hover, #back-to-lobby-button:hover, #restart-button:hover {
+#start-game-button:hover, #login-button:hover, #ready-button:hover, #start-solo-button:hover, #back-to-lobby-button:hover, #restart-button:hover, #back-to-menu-button:hover {
     background-color: #2ea043;
 }
 
@@ -197,6 +197,12 @@ canvas {
 
 #game-over-screen p {
     font-size: 1.5em;
+}
+
+.game-over-buttons {
+    display: flex;
+    gap: 20px; /* ໄລຍະຫ່າງລະຫວ່າງປຸ່ມ */
+    margin-top: 20px;
 }
 
 #ready-button.ready {

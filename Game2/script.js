@@ -10,6 +10,7 @@ const gameOverScreen = document.getElementById('game-over-screen');
 const leaderboardEl = document.getElementById('leaderboard');
 const restartButton = document.getElementById('restart-button');
 const startGameButton = document.getElementById('start-game-button');
+const backToMenuButton = document.getElementById('back-to-menu-button'); // ເພີ່ມປຸ່ມກັບຄືນ
 
 // --- ການຕັ້ງຄ່າເກມ ---
 canvas.width = 600;
@@ -40,7 +41,8 @@ const translations = {
         gameOverTitle: "ການແຂ່ງຂັນສິ້ນສຸດ!",
         restartButton: "ຫຼິ້ນໃໝ່",
         playerName: "ທ່ານ",
-        scoreUnit: "ຄະແນນ"
+        scoreUnit: "ຄະແນນ",
+        backButton: "ກັບຄືນ" // ຄຳແປໃໝ່
     },
     en: {
         selectLanguage: "Select Language:",
@@ -51,7 +53,8 @@ const translations = {
         gameOverTitle: "Game Over!",
         restartButton: "Restart",
         playerName: "You",
-        scoreUnit: "Points"
+        scoreUnit: "Points",
+        backButton: "Back" // ຄຳແປໃໝ່
     }
 };
 let currentLang = 'lo';
@@ -436,6 +439,21 @@ startGameButton.addEventListener('click', () => {
     // 5. ເລີ່ມ Game Loop
     requestAnimationFrame(update);
 });
+
+backToMenuButton.addEventListener('click', () => {
+    // ຢຸດເກມປັດຈຸບັນ
+    isGameOver = true;
+
+    // ຢຸດດົນຕີ ແລະ ຣີເຊັດ
+    sounds.backgroundMusic.pause();
+    sounds.backgroundMusic.currentTime = 0;
+    musicStarted = false;
+
+    // ສະຫຼັບໜ້າຈໍ
+    gameScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+});
+
 
 // ຕັ້ງຄ່າພາສາເລີ່ມຕົ້ນຂອງ UI
 setLanguage(currentLang);
