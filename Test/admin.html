@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ຈັດການບົດກວດກາ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-section {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+        .admin-section h2 {
+            color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+        .info-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+        #scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #scores-table th, #scores-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #scores-table th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+        #questions-list .question-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+        }
+        #questions-list .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .matching-pair {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+        }
+        .matching-pair input[type="text"] {
+            flex: 1;
+        }
+        .matching-pair .delete-pair-btn {
+            background-color: #ffc107;
+            color: #333;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ເພີ່ມ Library SheetJS ເພື່ອຈັດການ Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <div class="quiz-container">
+        <h1>⚙️ Admin Panel - ຈັດການບົດກວດກາ</h1>
+
+        <!-- Section ສ້າງຄຳຖາມ -->
+        <form id="add-question-form" class="admin-section">
+            <h2>1. ສ້າງຄຳຖາມໃໝ່</h2>
+            <div class="form-group">
+                <label for="q-type">ປະເພດຄຳຖາມ:</label>
+                <select id="q-type">
+                    <option value="multiple-choice">ປາລະໄນ</option>
+                    <option value="fill-in">ອັດຕະໄນ</option>
+                    <option value="image-multiple-choice">ຮູບພາບປາລະໄນ</option>
+                    <option value="image-fill-in">ຮູບພາບອັດຕະໄນ</option>
+                    <option value="matching-text-text">ຈັບຄູ່ (ຕົວໜັງສື-ຕົວໜັງສື)</option>
+                    <option value="matching-text-image">ຈັບຄູ່ (ຕົວໜັງສື-ຮູບພາບ)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="q-text">ຄຳຖາມ:</label>
+                <textarea id="q-text" rows="2"></textarea>
+            </div>
+            <div class="form-group" id="q-image-group">
+                <label for="q-image-upload">ອັບໂຫຼດຮູບພາບ (ຖ້າມີ):</label>
+                <input type="file" id="q-image-upload" accept="image/*">
+                <img id="q-image-preview" src="" alt="ຕົວຢ່າງຮູບ" style="max-width: 100px; max-height: 100px; display: none; margin-top: 10px; border-radius: 5px;">
+                <!-- ໃຊ້ເພື່ອເກັບຂໍ້ມູນຮູບແບບ Base64 -->
+                <input type="hidden" id="q-image-base64">
+            </div>
+            <div class="form-group" id="q-options-group">
+                <label for="q-options">ຕົວເລືອກ (ແຍກແຕ່ລະຕົວເລືອກດ້ວຍເຄື່ອງໝາຍຈຸດ ,):</label>
+                <input type="text" id="q-options" placeholder="ຕົວເລືອກ ກ, ຕົວເລືອກ ຂ, ຕົວເລືອກ ຄ">
+            </div>
+            <div class="form-group" id="q-answer-group">
+                <label for="q-answer">ຄຳຕອບທີ່ຖືກຕ້ອງ:</label>
+                <input type="text" id="q-answer" placeholder="ປ້ອນຄຳຕອບທີ່ຖືກຕ້ອງອັນດຽວ">
+            </div>
+            <!-- Container for matching pairs -->
+            <div id="matching-pairs-container" class="form-group" style="display: none;">
+                <label>ຄູ່ຄຳຕອບ:</label>
+                <div id="matching-pairs-list">
+                    <!-- Dynamic pairs will be added here -->
+                </div>
+                <button type="button" id="add-pair-btn" style="margin-top: 10px;">+ ເພີ່ມຄູ່</button>
+            </div>
+            <button id="add-q-btn" class="submit-btn" style="background-color: #28a745;">+ ເພີ່ມຄຳຖາມ</button>
+        </form>
+
+        <!-- Section ເພີ່ມນັກຮຽນ -->
+        <div class="admin-section">
+            <h2>2. ເພີ່ມລາຍຊື່ນັກຮຽນ</h2>
+            <div class="form-group">
+                <label for="excel-file-input">ເລືອກໄຟລ໌ Excel ເພື່ອນຳເຂົ້າລາຍຊື່:</label>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls">
+                <p class="info-text">
+                    <strong>ຄຳແນະນຳ:</strong> ໄຟລ໌ Excel ຄວນມີ <strong>ລະຫັດນັກຮຽນ (ID) ຢູ່ຖັນທີສາມ (Column C)</strong>.
+                </p>
+            </div>
+            <div id="students-preview-container" style="margin-top: 15px;"></div>
+            <button type="button" id="confirm-import-btn" class="submit-btn" style="display: none; background-color: #28a745; margin-top: 10px;">✅ ຢືນຢັນການນຳເຂົ້າ</button>
+        </div>
+
+        <!-- Section ລາຍຊື່ນັກຮຽນໃນລະບົບ -->
+        <div class="admin-section">
+            <h2>3. ລາຍຊື່ນັກຮຽນທັງໝົດໃນລະບົບ</h2>
+            <button type="button" id="delete-all-students-btn" class="submit-btn" style="background-color: #dc3545; margin-bottom: 15px;">🗑️ ລຶບຂໍ້ມູນນັກຮຽນທັງໝົດ</button>
+            <div id="all-students-list">
+                <!-- ລາຍຊື່ນັກຮຽນທັງໝົດຈະສະແດງຢູ່ບ່ອນນີ້ -->
+            </div>
+        </div>
+
+        <!-- Section ລາຍການຄະແນນນັກຮຽນ -->
+        <div class="admin-section">
+            <h2>4. ຄະແນນນັກຮຽນ</h2>
+            <button id="export-scores-btn" class="submit-btn" style="background-color: #17a2b8;">📤 Export ຄະແນນເປັນ Excel</button>
+            <button type="button" id="delete-all-scores-btn" class="submit-btn" style="background-color: #dc3545; margin-top: 10px;">🗑️ ລຶບຂໍ້ມູນຄະແນນທັງໝົດ</button>
+            <div id="scores-list"></div>
+        </div>
+
+        <!-- Section ລາຍການຄຳຖາມ -->
+        <div class="admin-section">
+            <h2>5. ລາຍການຄຳຖາມທັງໝົດ</h2>
+            <div id="questions-list"></div>
+        </div>
+        
+        <!-- Section ຈັດການເວລາ -->
+        <div class="admin-section">
+            <h2>6. ຈັດການການສອບເສັງ</h2>
+            <button type="button" id="start-quiz-btn" class="submit-btn" style="background-color: #28a745;">🚀 ເລີ່ມການສອບເສັງ</button>
+            <button type="button" id="stop-quiz-btn" class="submit-btn" style="background-color: #dc3545; margin-top: 10px;">🛑 ຢຸດການສອບເສັງ</button>
+            <div id="quiz-status-display" style="text-align: center; font-size: 1.2em; font-weight: bold; margin-top: 15px; color: #0056b3;"></div>
+        </div>
+        
+        <p id="status-message" style="text-align:center; color: green; font-weight: bold;"></p>
+
+    </div>
+
+    <script>
+        const addQuestionBtn = document.getElementById('add-q-btn');
+        const fileInput = document.getElementById('excel-file-input');
+        const confirmImportBtn = document.getElementById('confirm-import-btn');
+        const exportScoresBtn = document.getElementById('export-scores-btn');
+        const statusMessage = document.getElementById('status-message');
+        const questionsListDiv = document.getElementById('questions-list');
+        const addQuestionForm = document.getElementById('add-question-form');
+        const scoresListDiv = document.getElementById('scores-list');
+        const studentsPreviewContainer = document.getElementById('students-preview-container');
+        const qImageUpload = document.getElementById('q-image-upload');
+        const qImagePreview = document.getElementById('q-image-preview');
+        const qImageBase64 = document.getElementById('q-image-base64');
+        const qTypeSelect = document.getElementById('q-type');
+        const qImageGroup = document.getElementById('q-image-group');
+        const qOptionsGroup = document.getElementById('q-options-group');
+        const qAnswerGroup = document.getElementById('q-answer-group');
+        const matchingPairsContainer = document.getElementById('matching-pairs-container');
+        const addPairBtn = document.getElementById('add-pair-btn');
+        const deleteAllStudentsBtn = document.getElementById('delete-all-students-btn');
+        const deleteAllScoresBtn = document.getElementById('delete-all-scores-btn');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const stopQuizBtn = document.getElementById('stop-quiz-btn');
+        const quizStatusDisplay = document.getElementById('quiz-status-display');
+        const allStudentsListDiv = document.getElementById('all-students-list');
+        let studentsToImport = []; // ຕົວແປເພື່ອເກັບລາຍຊື່ຊົ່ວຄາວ (Object {name, id})
+
+        // Function ເພື່ອສະແດງລາຍການຄຳຖາມ
+        function renderQuestions() {
+            const questions = JSON.parse(localStorage.getItem('quiz_questions') || '[]');
+            questionsListDiv.innerHTML = ''; // ລ້າງລາຍການເກົ່າອອກກ່ອນ
+
+            if (questions.length === 0) {
+                questionsListDiv.innerHTML = '<p>ຍັງບໍ່ມີຄຳຖາມໃນລະບົບ.</p>';
+                return;
+            }
+
+            questions.forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'question-item';
+                item.innerHTML = `
+                    <span>${index + 1}. ${q.question.substring(0, 50)}${q.question.length > 50 ? '...' : ''}</span>
+                    <button class="delete-btn" data-index="${index}">ລຶບ</button>
+                `;
+                questionsListDiv.appendChild(item);
+            });
+        }
+
+        // Function ເພື່ອລຶບຄຳຖາມ
+        function deleteQuestion(index) {
+            if (confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຄຳຖາມທີ ${index + 1}?`)) {
+                let questions = JSON.parse(localStorage.getItem('quiz_questions') || '[]');
+                questions.splice(index, 1); // ລຶບອອກຈາກ array
+                localStorage.setItem('quiz_questions', JSON.stringify(questions)); // ບັນທຶກກັບ
+                renderQuestions(); // ສະແດງຜົນໃໝ່
+                showStatus('ລຶບຄຳຖາມສຳເລັດ!', 'red');
+            }
+        }
+
+        // Function ເພື່ອສະແດງຄະແນນ
+        function renderScores() {
+            const scores = JSON.parse(localStorage.getItem('quiz_scores') || '[]');
+            scoresListDiv.innerHTML = '';
+
+            if (scores.length === 0) {
+                scoresListDiv.innerHTML = '<p>ຍັງບໍ່ມີຂໍ້ມູນຄະແນນ.</p>';
+                return;
+            }
+
+            let table = '<table id="scores-table"><thead><tr><th>ລະຫັດນັກຮຽນ</th><th>ຄະແນນ (ເຕັມ 10)</th><th>ວັນທີສອບເສັງ</th></tr></thead><tbody>';
+            scores.forEach(score => {
+                table += `
+                    <tr>
+                        <td>${score.studentId}</td>
+                        <td>${score.score}</td>
+                        <td>${new Date(score.date).toLocaleString('lo-LA')}</td>
+                    </tr>
+                `;
+            });
+            table += '</tbody></table>';
+            scoresListDiv.innerHTML = table;
+        }
+
+        // Function ເພື່ອສະແດງລາຍຊື່ນັກຮຽນທັງໝົດໃນລະບົບ
+        function renderAllStudents() {
+            const students = JSON.parse(localStorage.getItem('quiz_students_data') || '[]');
+            allStudentsListDiv.innerHTML = '';
+
+            if (students.length === 0) {
+                allStudentsListDiv.innerHTML = '<p>ຍັງບໍ່ມີນັກຮຽນໃນລະບົບ.</p>';
+                return;
+            }
+
+            let table = `<table id="scores-table">
+                            <thead><tr><th>ລຳດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th></tr></thead>
+                            <tbody>`;
+            students.forEach((student, index) => {
+                table += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${student.name}</td>
+                        <td>${student.id}</td>
+                    </tr>
+                `;
+            });
+            table += '</tbody></table>';
+            allStudentsListDiv.innerHTML = table;
+        }
+
+        // Function ເພື່ອບັນທຶກລາຍຊື່ນັກຮຽນ
+        function saveStudents(newStudentData) {
+            let students = JSON.parse(localStorage.getItem('quiz_students_data') || '[]');
+            const existingIds = students.map(s => s.id);
+            const newStudents = newStudentData.filter(s => s.id && !existingIds.includes(s.id)); // ກັ່ນຕອງ ID ທີ່ບໍ່ມີ ແລະ ຊ້ຳ
+            
+            students = [...students, ...newStudents];
+            localStorage.setItem('quiz_students_data', JSON.stringify(students));
+            showStatus(`ນຳເຂົ້າ ${newStudents.length} ລາຍຊື່ໃໝ່ສຳເລັດ!`);
+        }
+
+        // Function ສະແດງຂໍ້ຄວາມສະຖານະ
+        function showStatus(message, color = 'green') {
+            statusMessage.textContent = message;
+            statusMessage.style.color = color;
+            setTimeout(() => { statusMessage.textContent = ''; }, 3000);
+        }
+
+        // Function ເພື່ອສະແດງ/ເຊື່ອງຟອມຕາມປະເພດຄຳຖາມ
+        function updateFormVisibility() {
+            const selectedType = qTypeSelect.value;
+            qImageGroup.style.display = selectedType.includes('image') ? 'block' : 'none';
+            qOptionsGroup.style.display = selectedType.includes('multiple-choice') ? 'block' : 'none';
+            qAnswerGroup.style.display = !selectedType.includes('matching') ? 'block' : 'none';
+            matchingPairsContainer.style.display = selectedType.includes('matching') ? 'block' : 'none';
+
+            // Clear pairs when switching away from matching type
+            if (!selectedType.includes('matching')) {
+                document.getElementById('matching-pairs-list').innerHTML = '';
+            }
+        }
+
+        // Function to add a new pair for matching questions
+        function addMatchingPair() {
+            const list = document.getElementById('matching-pairs-list');
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'matching-pair';
+            const selectedType = qTypeSelect.value;
+
+            let pairHTML = `<input type="text" class="matching-term" placeholder="ຄຳສັບ...">`;
+
+            if (selectedType === 'matching-text-text') {
+                pairHTML += `<input type="text" class="matching-match-text" placeholder="ຄຳອະທິບາຍ...">`;
+            } else if (selectedType === 'matching-text-image') {
+                pairHTML += `<input type="file" class="matching-match-image" accept="image/*">`;
+            }
+
+            pairHTML += `<button type="button" class="delete-pair-btn">X</button>`;
+            pairDiv.innerHTML = pairHTML;
+
+            list.appendChild(pairDiv);
+        }
+
+        // Event listener for adding pairs
+        addPairBtn.addEventListener('click', addMatchingPair);
+
+        // Event listener for deleting pairs (using event delegation)
+        document.getElementById('matching-pairs-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-pair-btn')) {
+                e.target.closest('.matching-pair').remove();
+            }
+        });
+        
+        // ເພີ່ມຄຳຖາມ
+        addQuestionForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // ປ້ອງກັນການໂຫຼດໜ້າເວັບຄືນ
+            const type = qTypeSelect.value;
+            let newQuestion = { type: type, question: document.getElementById('q-text').value };
+
+            if (type.includes('matching')) {
+                const pairs = [];
+                const pairElements = document.querySelectorAll('.matching-pair');
+                
+                for (const pairEl of pairElements) {
+                    const term = pairEl.querySelector('.matching-term').value;
+                    if (!term) continue;
+
+                    let match;
+                    if (type === 'matching-text-text') {
+                        match = pairEl.querySelector('.matching-match-text').value;
+                    } else if (type === 'matching-text-image') {
+                        const fileInput = pairEl.querySelector('.matching-match-image');
+                        if (fileInput && fileInput.files[0]) {
+                            // Convert image to Base64
+                            match = await new Promise((resolve) => {
+                                const reader = new FileReader();
+                                reader.onload = (e) => resolve(e.target.result);
+                                reader.readAsDataURL(fileInput.files[0]);
+                            });
+                        }
+                    }
+                    if (match) pairs.push({ term, match });
+                }
+                newQuestion.pairs = pairs;
+
+                if (!newQuestion.question || pairs.length < 2) {
+                    alert('ກະລຸນາປ້ອນຄຳຖາມຫຼັກ ແລະ ເພີ່ມຢ່າງໜ້ອຍ 2 ຄູ່!');
+                    return;
+                }
+            } else {
+                newQuestion.image = qImageBase64.value || undefined;
+                newQuestion.options = document.getElementById('q-options').value.split(',').map(opt => opt.trim());
+                newQuestion.answer = document.getElementById('q-answer').value.trim();
+
+                if (!newQuestion.question || !newQuestion.answer) {
+                    alert('ກະລຸນາປ້ອນຄຳຖາມ ແລະ ຄຳຕອບ!');
+                    return;
+                }
+            }
+
+            if (!newQuestion.question) {
+                alert('ກະລຸນາປ້ອນຄຳຖາມຫຼັກ!');
+                return;
+            }
+
+            let questions = JSON.parse(localStorage.getItem('quiz_questions') || '[]');
+            questions.push(newQuestion);
+            localStorage.setItem('quiz_questions', JSON.stringify(questions));
+            showStatus('ເພີ່ມຄຳຖາມສຳເລັດ!');
+            addQuestionForm.reset(); // ລ້າງຟອມ
+            // ລ້າງຕົວຢ່າງຮູບ ແລະ ຂໍ້ມູນ Base64
+            qImagePreview.style.display = 'none';
+            qImagePreview.src = '';
+            qImageBase64.value = '';
+            qImageUpload.value = '';
+
+            renderQuestions(); // ອັບເດດລາຍການຄຳຖາມ
+
+            // ກັບຄືນໄປສະແດງຟອມຕາມຄ່າເລີ່ມຕົ້ນ
+            updateFormVisibility();
+        });
+
+        // ສະແດງຕົວຢ່າງຮູບເມື່ອອັບໂຫຼດ
+        qImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    qImagePreview.src = e.target.result;
+                    qImagePreview.style.display = 'block';
+                    qImageBase64.value = e.target.result; // ເກັບຂໍ້ມູນ Base64 ໄວ້
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 1. ສະແດງຕົວຢ່າງລາຍຊື່ອັດຕະໂນມັດເມື່ອເລືອກໄຟລ໌ Excel
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                // ແປງຂໍ້ມູນໃນ sheet ເປັນ JSON, header: 1 ໝາຍຄວາມວ່າຂໍ້ມູນເລີ່ມຈາກແຖວທຳອິດ
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                // ກັ່ນຕອງເອົາແຖວທີ່ມີຂໍ້ມູນ ID ນັກຮຽນ (ຖັນທີ 3)
+                studentsToImport = jsonData
+                    .filter(row => row && typeof row[2] !== 'undefined' && row[2] !== null && String(row[2]).trim() !== '') // ກັ່ນເອົາແຖວທີ່ມີ ID
+                    .map(row => ({
+                        name: row[1] || 'ບໍ່ມີຊື່', // ຖັນ B
+                        id: String(row[2]).trim() // ຖັນ C
+                    }));
+
+                if (studentsToImport.length > 0) {
+                    let previewHtml = `<h4>ຕົວຢ່າງລາຍຊື່ທີ່ຈະນຳເຂົ້າ (${studentsToImport.length} ຄົນ):</h4>
+                                     <table id="scores-table">
+                                        <thead><tr><th>ລຳດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th></tr></thead>
+                                        <tbody>`;
+                    studentsToImport.forEach((student, index) => {
+                        previewHtml += `<tr>
+                                          <td>${index + 1}</td>
+                                          <td>${student.name}</td>
+                                          <td><strong>${student.id}</strong></td>
+                                        </tr>`;
+                    });
+                    previewHtml += '</tbody></table>';
+                    studentsPreviewContainer.innerHTML = previewHtml;
+                    confirmImportBtn.style.display = 'block'; // ສະແດງປຸ່ມຢືນຢັນ
+                } else {
+                    studentsPreviewContainer.innerHTML = '<p style="color: red;">ບໍ່ພົບຂໍ້ມູນລະຫັດນັກຮຽນໃນຖັນທີ 3 ຂອງໄຟລ໌.</p>';
+                    confirmImportBtn.style.display = 'none';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        // 2. ຢືນຢັນການນຳເຂົ້າລາຍຊື່
+        confirmImportBtn.addEventListener('click', () => {
+            if (studentsToImport.length > 0) {
+                saveStudents(studentsToImport);
+                studentsToImport = []; // ລ້າງຂໍ້ມູນຊົ່ວຄາວ
+                studentsPreviewContainer.innerHTML = ''; // ລ້າງໜ້າສະແດງຕົວຢ່າງ
+                confirmImportBtn.style.display = 'none'; // ເຊື່ອງປຸ່ມຢືນຢັນຫຼັງຈາກນຳເຂົ້າສຳເລັດ
+                renderAllStudents(); // ອັບເດດລາຍຊື່ທັງໝົດໃນລະບົບ
+                document.getElementById('excel-file-input').value = ''; // ລ້າງໄຟລ໌ທີ່ເລືອກ
+            }
+        });
+
+
+        // ສົ່ງອອກຄະແນນເປັນ Excel
+        exportScoresBtn.addEventListener('click', () => {
+            const scores = JSON.parse(localStorage.getItem('quiz_scores') || '[]');
+            const students = JSON.parse(localStorage.getItem('quiz_students_data') || '[]');
+
+            if (scores.length === 0) {
+                alert('ຍັງບໍ່ມີຂໍ້ມູນຄະແນນເພື່ອສົ່ງອອກ!');
+                return;
+            }
+
+            // ສ້າງ Map ເພື່ອໃຫ້ຊອກຫາຊື່ນັກຮຽນໄດ້ໄວຂຶ້ນ
+            const studentMap = new Map(students.map(s => [s.id, s.name]));
+
+            const dataToExport = scores.map((s, index) => ({
+                'ລຳດັບ': index + 1,
+                'ຊື່ ນັກຮຽນ': studentMap.get(s.studentId) || 'ບໍ່ພົບຊື່',
+                'ID ນັກຮຽນ': s.studentId,
+                'ຄະແນນ (ເຕັມ 10)': s.score
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Scores");
+            XLSX.writeFile(workbook, "Student_Scores.xlsx");
+        });
+
+        // Event listener ສຳລັບປຸ່ມລຶບ (ໃຊ້ Event Delegation)
+        questionsListDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-btn')) {
+                const index = parseInt(event.target.dataset.index, 10);
+                deleteQuestion(index);
+            }
+        });
+
+        // Event listener to delete all students
+        deleteAllStudentsBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນນັກຮຽນທັງໝົດອອກຈາກລະບົບ? ການກະທຳນີ້ບໍ່ສາມາດກູ້ຄືນໄດ້.')) {
+                localStorage.removeItem('quiz_students_data');
+                renderAllStudents(); // Re-render the (now empty) list
+                showStatus('ລຶບຂໍ້ມູນນັກຮຽນທັງໝົດສຳເລັດ!', 'red');
+            }
+        });
+
+        // Event listener to delete all scores
+        deleteAllScoresBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນຄະແນນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດກູ້ຄືນໄດ້.')) {
+                localStorage.removeItem('quiz_scores');
+                renderScores(); // Re-render the (now empty) list
+                showStatus('ລຶບຂໍ້ມູນຄະແນນທັງໝົດສຳເລັດ!', 'red');
+            }
+        });
+
+        // --- Quiz Control Logic ---
+        function updateQuizStatusDisplay() {
+            const status = localStorage.getItem('quiz_status');
+            if (status === 'active') {
+                quizStatusDisplay.textContent = '🟢 ສະຖານະ: ກໍາລັງດໍາເນີນ';
+                quizStatusDisplay.style.color = '#28a745';
+                startQuizBtn.disabled = true;
+                stopQuizBtn.disabled = false;
+            } else {
+                quizStatusDisplay.textContent = '🔴 ສະຖານະ: ປິດ';
+                quizStatusDisplay.style.color = '#dc3545';
+                startQuizBtn.disabled = false;
+                stopQuizBtn.disabled = true;
+            }
+        }
+
+        startQuizBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານຕ້ອງການເລີ່ມການສອບເສັງບໍ່? ນັກຮຽນຈະສາມາດເຂົ້າສອບເສັງໄດ້ທັນທີ.')) {
+                localStorage.setItem('quiz_status', 'active');
+                updateQuizStatusDisplay();
+            }
+        });
+
+        stopQuizBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການຢຸດການສອບເສັງ? ນັກຮຽນທຸກຄົນຈະຖືກບັງຄັບໃຫ້ສົ່ງຄຳຕອບທັນທີ.')) {
+                localStorage.setItem('quiz_status', 'finished');
+                updateQuizStatusDisplay();
+            }
+        });
+
+        // Initialize status on page load
+        updateQuizStatusDisplay();
+        // --- End of Quiz Control Logic ---
+
+        // ເລີ່ມສະແດງລາຍການຄຳຖາມເມື່ອໜ້າເວັບໂຫຼດ
+        renderQuestions();
+        renderScores();
+        renderAllStudents();
+
+        // ຕັ້ງຄ່າການສະແດງຟອມໃນຕອນເລີ່ມຕົ້ນ ແລະ ເມື່ອມີການປ່ຽນແປງ
+        qTypeSelect.addEventListener('change', updateFormVisibility);
+        updateFormVisibility(); // ເອີ້ນໃຊ້ຕອນໂຫຼດໜ້າເວັບ
+
+    </script>
+</body>
+</html>
