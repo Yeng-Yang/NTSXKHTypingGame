@@ -1,0 +1,97 @@
+.result-box {
+    text-align: center;
+}
+/* Logout Timer Style */
+#logout-timer-container {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+.result-box {
+    text-align: center;
+}
+.score-display {
+    font-size: 3em;
+    font-weight: bold;
+    color: #007bff;
+    margin: 20px 0;
+}
+.student-info {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+.back-button {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    color: #fff;
+    background-color: #6c757d;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+.back-button:hover {
+    background-color: #5a6268;
+}
+/* Styles for ranking table on student page */
+#scores-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+    font-size: 0.9em;
+}
+#scores-table th, #scores-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+#scores-table .current-student-row {
+    background-color: #d1ecf1 !important; /* Light blue highlight */
+    font-weight: bold;
+}
+
+/* Podium Styles */
+.podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 15px;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 2px solid #eee;
+}
+.podium-spot {
+    width: 28%;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid;
+}
+.podium-spot h3 { margin-top: 0; font-size: 1.5em; }
+.podium-spot p { margin: 5px 0; }
+.podium-spot .score { font-size: 1.8em; font-weight: bold; margin-top: 10px; }
+.rank-1-spot {
+    order: 2; height: 220px; background-color: #fffbeb; border-color: #ffd700;
+}
+.rank-2-spot {
+    order: 1; height: 180px; background-color: #f8f9fa; border-color: #c0c0c0;
+}
+.rank-3-spot {
+    order: 3; height: 160px; background-color: #fff5f2; border-color: #cd7f32;
+}
+/* Ranking Table Row Colors */
+#scores-table tr.rank-1 {
+    background-color: #ffd700 !important; /* Gold */
+}
+#scores-table tr.rank-2 {
+    background-color: #c0c0c0 !important; /* Silver */
+}
+#scores-table tr.rank-3 {
+    background-color: #cd7f32 !important; /* Bronze */
+}

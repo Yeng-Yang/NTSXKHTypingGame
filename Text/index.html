@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ບົດກວດກາອອນລາຍ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- ໂຫຼດ Script ປ້ອງກັນ -->
+    <script src="protection.js" defer></script>
+
+    <!-- ເພີ່ມ Library SweetAlert2 ເພື່ອການແຈ້ງເຕືອນທີ່ສວຍງາມ -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- ເພີ່ມ Library Confetti ເພື່ອສ້າງ Style ລະເबิดແຕກ -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="quiz-container">
+        <div id="quiz-timer">--:--</div>
+        <div id="quiz-header">
+            <h1>ບົດກວດກາ</h1>
+            <div id="quiz-progress"></div>
+        </div>
+        <form id="quiz-form"></form>
+        <div id="navigation-container">
+            <button id="prev-btn" class="nav-btn">⬅️ ກັບຄືນ</button>
+            <button id="next-btn" class="nav-btn">ຕໍ່ໄປ ➡️</button>
+        </div>
+        <button id="submit-btn" class="submit-btn">✔️ ສົ່ງຄຳຕອບ</button>
+        <div id="result-container"></div>
+    </div>
+
+    <!-- ໂຫຼດ Supabase Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+
+    <!-- ໂຫຼດ Script ຫຼັກຂອງ Quiz -->
+    <script src="script.js"></script>
+
+</body>
+</html>
