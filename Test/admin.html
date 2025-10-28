@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ຈັດການບົດກວດກາ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-section {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+        .admin-section h2 {
+            color: #0056b3;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+        .info-text {
+            font-size: 0.9em;
+            color: #666;
+        }
+        #scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        #scores-table th, #scores-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #scores-table th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+        #questions-list .question-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+        }
+        #questions-list .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        #questions-list .edit-btn {
+            background-color: #ffc107;
+            color: #212529;
+            margin-right: 5px;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .delete-student-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .delete-preview-btn {
+            background-color: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .matching-pair {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            border-radius: 5px;
+        }
+        .matching-pair input[type="text"] {
+            flex: 1;
+        }
+        .matching-pair .delete-pair-btn {
+            background-color: #ffc107;
+            color: #333;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        /* Podium Styles */
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        .podium-spot {
+            width: 28%;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid;
+        }
+        .podium-spot h3 { margin-top: 0; font-size: 1.5em; }
+        .podium-spot p { margin: 5px 0; }
+        .podium-spot .score { font-size: 1.8em; font-weight: bold; margin-top: 10px; }
+        .rank-1-spot {
+            order: 2; height: 220px; background-color: #fffbeb; border-color: #ffd700;
+        }
+        .rank-2-spot {
+            order: 1; height: 180px; background-color: #f8f9fa; border-color: #c0c0c0;
+        }
+        .rank-3-spot {
+            order: 3; height: 160px; background-color: #fff5f2; border-color: #cd7f32;
+        }
+
+        /* Tab Menu Styles */
+        .tab-menu {
+            display: flex;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+        .tab-link {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1em;
+            font-family: 'Noto Sans Lao', sans-serif;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        .tab-link:hover {
+            background-color: #f1f1f1;
+        }
+        .tab-link.active {
+            border-bottom: 3px solid #007bff;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none; /* Hide all content by default */
+        }
+
+        /* Ranking Table Row Colors */
+        #scores-table tr.rank-1 {
+            background-color: #ffd700 !important; /* Gold */
+            font-weight: bold;
+        }
+        #scores-table tr.rank-2 {
+            background-color: #c0c0c0 !important; /* Silver */
+        }
+        #scores-table tr.rank-3 {
+            background-color: #cd7f32 !important; /* Bronze */
+        }
+        #scores-table tr.rank-other {
+            background-color: #f8f9fa;
+        }
+
+        /* Logout Button Style */
+        #logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        /* Exam Control Styles */
+        #exam-status-display {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: 2px solid;
+        }
+    </style>
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 700px;
+            border-radius: 10px;
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ເພີ່ມ Library SheetJS ເພື່ອຈັດການ Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- ໂຫຼດ Supabase Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+
+
+    <div class="quiz-container">
+        <script>
+            // ກວດສອບວ່າ Admin ໄດ້ລັອກອິນແລ້ວບໍ່
+            if (sessionStorage.getItem('admin_logged_in') !== 'true') {
+                alert('ກະລຸນາເຂົ້າສູ່ລະບົບ Admin ກ່ອນ!');
+                window.location.href = 'admin_login.html'; // ພາໄປໜ້າລັອກອິນ Admin
+            }
+        </script>
+
+
+        <h1>⚙️ Admin Panel - ຈັດການບົດກວດກາ</h1>
+        <a href="#" id="logout-btn">ອອກຈາກລະບົບ</a>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-menu">
+            <button class="tab-link active" onclick="openTab(event, 'create-question')">📝 ສ້າງຄຳຖາມໃໝ່</button>
+            <button class="tab-link" onclick="openTab(event, 'question-list')">📋 ລາຍການຄຳຖາມ</button>
+            <button class="tab-link" onclick="openTab(event, 'student-management')">🧑‍🎓 ຈັດການນັກຮຽນ</button>
+            <button class="tab-link" onclick="openTab(event, 'score-summary')">📊 ສະຫຼຸບຄະແນນ</button>
+            <button class="tab-link" onclick="openTab(event, 'exam-control')">🕹️ ຄວບຄຸມການສອບເສັງ</button>
+        </div>
+
+        <!-- Tab Content: Create Question -->
+        <div id="create-question" class="tab-content" style="display: block;">
+            <form id="add-question-form" class="admin-section">
+            <h2>ສ້າງຄຳຖາມໃໝ່</h2>
+            <div class="form-group">
+                <label for="q-type">ປະເພດຄຳຖາມ:</label>
+                <select id="q-type">
+                    <option value="multiple-choice">ປາລະໄນ</option>
+                    <option value="fill-in">ອັດຕະໄນ</option>
+                    <option value="image-multiple-choice">ຮູບພາບປາລະໄນ</option>
+                    <option value="image-fill-in">ຮູບພາບອັດຕະໄນ</option>
+                    <option value="matching-text-text">ຈັບຄູ່ (ຕົວໜັງສື-ຕົວໜັງສື)</option>
+                    <option value="matching-text-image">ຈັບຄູ່ (ຕົວໜັງສື-ຮູບພາບ)</option>
+                    <option value="drag-fill-in">ລາກຄຳຕອບໃສ່ບ່ອນວ່າງ</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="q-text">ຄຳຖາມ:</label>
+                <textarea id="q-text" rows="2"></textarea>
+            </div>
+            <div class="form-group" id="q-image-group">
+                <label for="q-image-upload">ອັບໂຫຼດຮູບພາບ (ຖ້າມີ):</label>
+                <input type="file" id="q-image-upload" accept="image/*">
+                <img id="q-image-preview" src="" alt="ຕົວຢ່າງຮູບ" style="max-width: 100px; max-height: 100px; display: none; margin-top: 10px; border-radius: 5px;">
+                <input type="hidden" id="q-image-base64">
+            </div>
+            <div class="form-group" id="q-options-group">
+                <label for="q-options" id="q-options-label">ຕົວເລືອກ (ແຍກແຕ່ລະຕົວເລືອກດ້ວຍເຄື່ອງໝາຍຈຸດ ,):</label>
+                <input type="text" id="q-options" placeholder="ຕົວເລືອກ ກ, ຕົວເລືອກ ຂ, ຕົວເລືອກ ຄ">
+                <p class="info-text" id="q-options-info" style="display: none;">ສຳລັບຄຳຖາມລາກຄຳຕອບ, ໃຫ້ປ້ອນສະເພາະຄຳຕອບຕົວຫຼອກ (distractors).</p>
+            </div>
+            <div class="form-group" id="q-answer-group">
+                <label for="q-answer">ຄຳຕອບທີ່ຖືກຕ້ອງ:</label>
+                <p class="info-text" id="q-text-info" style="display: none;">ໃນຊ່ອງຄຳຖາມ, ໃຫ້ໃຊ້ `__BLANK__` ເພື່ອສ້າງບ່ອນວ່າງ (ສາມາດໃຊ້ຫຼາຍບ່ອນໄດ້). ໃນຊ່ອງຄຳຕອບ, ໃຫ້ປ້ອນຄຳຕອບຕາມລຳດັບຂອງບ່ອນວ່າງ ແລະ ແຍກດ້ວຍເຄື່ອງໝາຍຈຸດ (,).</p>
+                <input type="text" id="q-answer" placeholder="ປ້ອນຄຳຕອບທີ່ຖືກຕ້ອງອັນດຽວ">
+            </div>
+            <div id="matching-pairs-container" class="form-group" style="display: none;">
+                <label>ຄູ່ຄຳຕອບ:</label>
+                <div id="matching-pairs-list"></div>
+                <button type="button" id="add-pair-btn" style="margin-top: 10px;">+ ເພີ່ມຄູ່</button>
+            </div>
+            <button id="add-q-btn" class="submit-btn" style="background-color: #28a745;">+ ເພີ່ມຄຳຖາມ</button>
+            </form>
+        </div>
+
+        <!-- Tab Content: Student Management -->
+        <div id="student-management" class="tab-content">
+            <div class="admin-section">
+            <h2>ເພີ່ມລາຍຊື່ນັກຮຽນ</h2>
+            <div class="form-group">
+                <label for="excel-file-input">ເລືອກໄຟລ໌ Excel ເພື່ອນຳເຂົ້າລາຍຊື່:</label>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls">
+                <p class="info-text">
+                    <strong>ຄຳແນະນຳ:</strong> ໄຟລ໌ Excel ຄວນມີ <strong>ລະຫັດນັກຮຽນ (ID) ຢູ່ຖັນທີສາມ (Column C)</strong>.
+                </p>
+            </div>
+            <div id="students-preview-container" style="margin-top: 15px;"></div>
+            <button type="button" id="confirm-import-btn" class="submit-btn" style="display: none; background-color: #28a745; margin-top: 10px;">✅ ຢືນຢັນການນຳເຂົ້າ</button>
+            </div>
+
+            <div class="admin-section">
+                <h2>ເຄື່ອງມືຈັດການຂໍ້ມູນ</h2>
+                <button type="button" id="delete-all-students-btn" class="submit-btn" style="background-color: #dc3545; margin-bottom: 15px;">🗑️ ລຶບຂໍ້ມູນນັກຮຽນທັງໝົດ</button>
+                <button type="button" id="delete-all-scores-btn" class="submit-btn" style="background-color: #fd7e14; margin-bottom: 15px;">🧹 ລຶບຂໍ້ມູນຄະແນນທັງໝົດ</button>
+            </div>
+
+            <div class="admin-section">
+                <h2>ລາຍຊື່ນັກຮຽນໃນລະບົບ</h2>
+                <div id="student-list-controls" style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <span>ສະແດງ: </span>
+                    <select id="rows-per-page-select" style="padding: 5px;">
+                        <option value="10" selected>10 ແຖວ</option>
+                        <option value="25">25 ແຖວ</option>
+                        <option value="50">50 ແຖວ</option>
+                        <option value="all">ທັງໝົດ</option>
+                    </select>
+                    <button id="prev-page-btn" class="submit-btn" style="padding: 5px 10px;" disabled>&lt; ກ່ອນໜ້າ</button>
+                    <span id="page-info"></span>
+                    <button id="next-page-btn" class="submit-btn" style="padding: 5px 10px;" disabled>ໜ້າຕໍ່ໄປ &gt;</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button id="export-student-list-excel-btn" class="submit-btn" style="background-color: #28a745;">📤 Export ເປັນ Excel</button>
+                </div>
+                <div id="student-list-no-ranking"></div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Question List -->
+        <div id="question-list" class="tab-content">
+            <div class="admin-section">
+                <h2>ລາຍການຄຳຖາມທັງໝົດ</h2>
+                <div id="questions-list"></div>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Score Summary -->
+        <div id="score-summary" class="tab-content">
+            <div class="admin-section">
+                <h2>ສະຫຼຸບຄະແນນ ແລະ ການຈັດອັນດັບ (ຄະແນນຫຼ້າສຸດ)</h2>
+                <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <button id="print-summary-btn" class="submit-btn" style="background-color: #007bff;">🖨️ ພິມ</button>
+                </div>
+                <div id="ranked-summary-content">
+                    <!-- Ranked summary table will be rendered here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Exam Control -->
+        <div id="exam-control" class="tab-content">
+            <div class="admin-section">
+                <h2>ຄວບຄຸມການສອບເສັງ</h2>
+                <div id="exam-status-display">ກຳລັງໂຫຼດສະຖານະ...</div>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button id="open-exam-btn" class="submit-btn" style="background-color: #17a2b8;">🟢 ເປີດຮັບນັກຮຽນ</button>
+                    <button id="start-exam-btn" class="submit-btn" style="background-color: #28a745;">🚀 ເລີ່ມສອບເສັງ (45 ນາທີ)</button>
+                    <button id="stop-exam-btn" class="submit-btn" style="background-color: #dc3545;">🛑 ຢຸດການສອບເສັງທັນທີ</button>
+                </div>
+                <p class="info-text" style="text-align: center; margin-top: 15px;"><strong>ໝາຍເຫດ:</strong> ເມື່ອກົດ "ເລີ່ມສອບເສັງ" ລະບົບຈະເລີ່ມຈັບເວລາ 45 ນາທີ. ນັກຮຽນຈະຖືກບັງຄັບໃຫ້ສົ່ງຄຳຕອບເມື່ອເວລາໝົດ.</p>
+            </div>
+            <div id="exam-control-scores" class="admin-section" style="display: none;">
+                 <h2>ສະຫຼຸບຄະແນນຫຼັງສິ້ນສຸດ</h2>
+                 <div id="exam-control-scores-content"></div>
+            </div>
+        </div>
+
+        <p id="status-message" style="text-align:center; color: green; font-weight: bold;"></p>
+
+        <!-- Modal for Editing Questions -->
+        <div id="edit-question-modal" class="modal">
+            <div class="modal-content">
+                <h2>ແກ້ໄຂຄຳຖາມ</h2>
+                <form id="edit-question-form-modal">
+                    <input type="hidden" id="edit-q-id">
+                    <div class="form-group">
+                        <label for="edit-q-type">ປະເພດຄຳຖາມ:</label>
+                        <select id="edit-q-type" disabled>
+                            <option value="multiple-choice">ປາລະໄນ</option>
+                            <option value="fill-in">ອັດຕະໄນ</option>
+                            <option value="image-multiple-choice">ຮູບພາບປາລະໄນ</option>
+                            <option value="image-fill-in">ຮູບພາບອັດຕະໄນ</option>
+                            <option value="matching-text-text">ຈັບຄູ່ (ຕົວໜັງສື-ຕົວໜັງສື)</option>
+                            <option value="matching-text-image">ຈັບຄູ່ (ຕົວໜັງສື-ຮູບພາບ)</option>
+                            <option value="drag-fill-in">ລາກຄຳຕອບໃສ່ບ່ອນວ່າງ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-q-text">ຄຳຖາມ:</label>
+                        <textarea id="edit-q-text" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" id="edit-q-image-group">
+                        <label>ຮູບພາບປັດຈຸບັນ:</label>
+                        <img id="edit-q-image-preview" src="" style="max-width: 100px; max-height: 100px; display: none; margin-bottom: 10px;">
+                        <label for="edit-q-image-upload">ປ່ຽນຮູບພາບ (ເລືອກຖ້າຕ້ອງການປ່ຽນ):</label>
+                        <input type="file" id="edit-q-image-upload" accept="image/*">
+                        <input type="hidden" id="edit-q-original-image-url">
+                    </div>
+                    <div class="form-group" id="edit-q-options-group">
+                        <label for="edit-q-options" id="edit-q-options-label">ຕົວເລືອກ (ແຍກດ້ວຍ ,):</label>
+                        <input type="text" id="edit-q-options">
+                        <p class="info-text" id="edit-q-options-info" style="display: none;">ສຳລັບຄຳຖາມລາກຄຳຕອບ, ໃຫ້ປ້ອນສະເພາະຄຳຕອບຕົວຫຼອກ (distractors).</p>
+                    </div>
+                    <div class="form-group" id="edit-q-answer-group">
+                        <label for="edit-q-answer">ຄຳຕອບທີ່ຖືກຕ້ອງ:</label>
+                        <p class="info-text" id="edit-q-text-info" style="display: none;">ໃນຊ່ອງຄຳຖາມ, ໃຫ້ໃຊ້ `__BLANK__` ເພື່ອສ້າງບ່ອນວ່າງ. ໃນຊ່ອງຄຳຕອບ, ໃຫ້ປ້ອນຄຳຕອບຕາມລຳດັບຂອງບ່ອນວ່າງ ແລະ ແຍກດ້ວຍເຄື່ອງໝາຍຈຸດ (,).</p>
+                        <input type="text" id="edit-q-answer">
+                    </div>
+                    <div id="edit-matching-pairs-container" class="form-group" style="display: none;">
+                        <label>ຄູ່ຄຳຕອບ:</label>
+                        <div id="edit-matching-pairs-list"></div>
+                        <button type="button" id="edit-add-pair-btn" style="margin-top: 10px;">+ ເພີ່ມຄູ່</button>
+                    </div>
+                    <button type="submit" class="submit-btn">ບັນທຶກການປ່ຽນແປງ</button>
+                    <button type="button" id="close-modal-btn" class="submit-btn" style="background-color: #6c757d; margin-top: 10px;">ຍົກເລີກ</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab switching logic
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+
+            if (tabName === 'score-summary') {
+                renderRankedSummary();
+            }
+            if (tabName === 'exam-control') {
+                updateExamStatusDisplay();
+            }
+            if (tabName === 'student-management') {
+                renderStudentListNoRanking();
+            }
+            if (tabName === 'question-list') {
+                renderQuestions();
+            }
+        }
+
+        const addQuestionBtn = document.getElementById('add-q-btn');
+        const fileInput = document.getElementById('excel-file-input');
+        const confirmImportBtn = document.getElementById('confirm-import-btn');
+        const printSummaryBtn = document.getElementById('print-summary-btn');
+        const statusMessage = document.getElementById('status-message');
+        const questionsListDiv = document.getElementById('questions-list');
+        const addQuestionForm = document.getElementById('add-question-form');
+        const qImageUpload = document.getElementById('q-image-upload');
+        const qImagePreview = document.getElementById('q-image-preview');
+        const qImageBase64 = document.getElementById('q-image-base64');
+        const qTypeSelect = document.getElementById('q-type');
+        const qImageGroup = document.getElementById('q-image-group');
+        const qOptionsGroup = document.getElementById('q-options-group');
+        const qAnswerGroup = document.getElementById('q-answer-group');
+        const qOptionsInfo = document.getElementById('q-options-info');
+        const qTextInfo = document.getElementById('q-text-info');
+        const matchingPairsContainer = document.getElementById('matching-pairs-container');
+        const addPairBtn = document.getElementById('add-pair-btn');
+        const deleteAllStudentsBtn = document.getElementById('delete-all-students-btn');
+        const deleteAllScoresBtn = document.getElementById('delete-all-scores-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const studentsPreviewContainer = document.getElementById('students-preview-container');
+        const studentListNoRankingDiv = document.getElementById('student-list-no-ranking');
+        let studentsToImport = [];
+
+        const openExamBtn = document.getElementById('open-exam-btn');
+        const startExamBtn = document.getElementById('start-exam-btn');
+        const stopExamBtn = document.getElementById('stop-exam-btn');
+        
+        let studentListPage = 1;
+        let studentListRowsPerPage = 10;
+        const rowsPerPageSelect = document.getElementById('rows-per-page-select');
+        const prevPageBtn = document.getElementById('prev-page-btn');
+        const nextPageBtn = document.getElementById('next-page-btn');
+        const exportStudentListExcelBtn = document.getElementById('export-student-list-excel-btn');
+        const pageInfoSpan = document.getElementById('page-info');
+
+        const loginSound = new Audio('https://actions.google.com/sounds/v1/communication/connect.ogg');
+        const submitSound = new Audio('https://actions.google.com/sounds/v1/impacts/results_impact_positive.ogg');
+
+        async function renderQuestions() {
+            questionsListDiv.innerHTML = '<p>ກຳລັງໂຫຼດຄຳຖາມ...</p>';
+            const { data: questions, error } = await supabase_client
+                .from('questions')
+                .select('id, question')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching questions:', error);
+                questionsListDiv.innerHTML = '<p style="color: red;">ບໍ່ສາມາດໂຫຼດລາຍການຄຳຖາມໄດ້.</p>';
+                return;
+            }
+
+            questionsListDiv.innerHTML = '';
+
+            if (questions.length === 0) {
+                questionsListDiv.innerHTML = '<p>ຍັງບໍ່ມີຄຳຖາມໃນລະບົບ.</p>';
+                return;
+            }
+
+            questions.forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'question-item';
+                item.innerHTML = `
+                    <span>${index + 1}. ${q.question.substring(0, 50)}${q.question.length > 50 ? '...' : ''}</span>
+                    <div>
+                        <button class="edit-btn" data-id="${q.id}">ແກ້ໄຂ</button>
+                        <button class="delete-btn" data-id="${q.id}">ລຶບ</button>
+                    </div>
+                `;
+                questionsListDiv.appendChild(item);
+            });
+        }
+
+        async function deleteQuestion(id) {
+            if (confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຄຳຖາມນີ້?`)) {
+                const { error } = await supabase_client.from('questions').delete().eq('id', id);
+                if (error) {
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບຄຳຖາມ.');
+                    console.error('Delete error:', error);
+                    return;
+                }
+                renderQuestions();
+                showStatus('ລຶບຄຳຖາມສຳເລັດ!', 'red');
+            }
+        }
+
+        // ຟັງຊັນສຳລັບໜ້າ "ສະຫຼຸບຄະແນນ"
+        async function renderRankedSummary() {
+            const container = document.getElementById('ranked-summary-content');
+            container.innerHTML = '<p>ກຳລັງໂຫຼດຂໍ້ມູນຄະແນນ...</p>';
+
+            const { data: students, error: studentsError } = await supabase_client
+                .from('students')
+                .select('id, name');
+
+            if (studentsError) {
+                container.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນນັກຮຽນ.</p>';
+                return;
+            }
+
+            const { data: submissions, error: submissionsError } = await supabase_client
+                .from('submissions')
+                .select('student_id, score, submitted_at');
+
+            if (submissionsError) {
+                container.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນຄະແນນ.</p>';
+                return;
+            }
+
+            const latestScores = new Map();
+            submissions.forEach(sub => {
+                const existing = latestScores.get(sub.student_id);
+                if (!existing || new Date(sub.submitted_at) > new Date(existing.submitted_at)) {
+                    latestScores.set(sub.student_id, sub.score);
+                }
+            });
+
+            const rankedData = students.map(student => ({
+                ...student,
+                score: latestScores.get(student.id) ?? null
+            })).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+            
+            // ແຍກ 3 ອັນດັບທຳອິດ ແລະ ອັນດັບອື່ນໆ
+            const top3 = rankedData.filter(s => s.score !== null).slice(0, 3);
+            const others = rankedData.slice(top3.length);
+
+            // ສ້າງ HTML ສຳລັບແທ່ນລາງວັນ (Podium)
+            let podiumHtml = '<div class="podium-container">';
+            const rank1 = top3[0];
+            const rank2 = top3[1];
+            const rank3 = top3[2];
+
+            // ອັນດັບ 2
+            podiumHtml += rank2 ? `<div class="podium-spot rank-2-spot"><h3>🥈 ອັນດັບ 2</h3><p>${rank2.name}</p><p>ID: ${rank2.id}</p><p class="score">${rank2.score}</p></div>` : '<div></div>';
+            // ອັນດັບ 1
+            podiumHtml += rank1 ? `<div class="podium-spot rank-1-spot"><h3>🥇 ອັນດັບ 1</h3><p>${rank1.name}</p><p>ID: ${rank1.id}</p><p class="score">${rank1.score}</p></div>` : '<div><p>ຍັງບໍ່ມີຂໍ້ມູນຄະແນນ</p></div>';
+            // ອັນດັບ 3
+            podiumHtml += rank3 ? `<div class="podium-spot rank-3-spot"><h3>🥉 ອັນດັບ 3</h3><p>${rank3.name}</p><p>ID: ${rank3.id}</p><p class="score">${rank3.score}</p></div>` : '<div></div>';
+            podiumHtml += '</div>';
+
+            // ສ້າງ HTML ສຳລັບຕາຕະລາງອັນດັບອື່ນໆ
+            let tableHtml = '<h4>ອັນດັບອື່ນໆ</h4><table id="scores-table"><thead><tr><th>ອັນດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th><th>ຄະແນນ</th></tr></thead><tbody>';
+            rankedData.forEach((data, index) => {
+                let rankClass = 'rank-other';
+                if (data.score !== null) {
+                    const rank = rankedData.filter(s => s.score !== null).findIndex(s => s.id === data.id);
+                    if (rank === 0) rankClass = 'rank-1';
+                    if (rank === 1) rankClass = 'rank-2';
+                    if (rank === 2) rankClass = 'rank-3';
+                } else {
+                    rankClass = '';
+                }
+
+                tableHtml += `<tr class="${rankClass}"><td>${data.score !== null ? (index + 1) : '-'}</td><td>${data.name}</td><td>${data.id}</td><td>${data.score ?? 'ຍັງບໍ່ມີ'}</td></tr>`;
+            });
+            tableHtml += '</tbody></table>';
+
+            container.innerHTML = podiumHtml + tableHtml;
+        }
+        
+        // ຟັງຊັນສຳລັບໜ້າ "ຄວບຄຸມການສອບເສັງ"
+        async function renderScores(targetElementId, sessionId) {
+             const targetDiv = document.getElementById(targetElementId);
+             if (!targetDiv) return;
+             targetDiv.innerHTML = '<p>ກຳລັງໂຫຼດຂໍ້ມູນຄະແນນ...</p>';
+
+            const { data: allStudents, error: studentsError } = await supabase_client
+                .from('students')
+                .select('id, name');
+
+            if (studentsError) {
+                targetDiv.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດລາຍຊື່ນັກຮຽນ.</p>';
+                return;
+            }
+
+            const { data: submissions, error: submissionsError } = await supabase_client
+                .from('submissions')
+                .select(`score, student_id`)
+                .eq('session_id', sessionId);
+
+            if (submissionsError) {
+                targetDiv.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຄະແນນ.</p>';
+                return;
+            }
+
+            const scoreMap = new Map(submissions.map(sub => [sub.student_id, sub.score]));
+
+            const rankedData = allStudents.map(student => ({
+                id: student.id,
+                name: student.name,
+                score: scoreMap.get(student.id) ?? null
+            })).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+
+            if (rankedData.length === 0) {
+                targetDiv.innerHTML = '<p>ບໍ່ພົບຂໍ້ມູນນັກຮຽນໃນລະບົບ.</p>';
+                return;
+            }
+
+            let table = `<table id="scores-table">
+                            <thead><tr><th>ອັນດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th><th>ຄະແນນກວດກາ</th></tr></thead>
+                            <tbody>`;
+            rankedData.forEach((student) => {
+                let rankClass = 'rank-other';
+                if (student.score !== null) {
+                    const scoredStudents = rankedData.filter(s => s.score !== null);
+                    const rank = scoredStudents.findIndex(s => s.id === student.id);
+                    if (rank === 0) rankClass = 'rank-1';
+                    if (rank === 1) rankClass = 'rank-2';
+                    if (rank === 2) rankClass = 'rank-3';
+                }
+
+                table += `
+                    <tr class="${rankClass}">
+                        <td>${student.score !== null ? (rankedData.filter(s => s.score !== null).findIndex(s => s.id === student.id) + 1) : '-'}</td>
+                        <td>${student.name}</td>
+                        <td>${student.id}</td>
+                        <td>${student.score ?? 'ບໍ່ໄດ້ເຂົ້າສອບເສັງ'}</td>
+                    </tr>
+                `;
+            });
+            table += '</tbody></table>';
+            targetDiv.innerHTML = table;
+        }
+
+        async function renderStudentListNoRanking(page = 1) {
+            studentListPage = page;
+            studentListRowsPerPage = rowsPerPageSelect.value === 'all' ? Infinity : parseInt(rowsPerPageSelect.value, 10);
+            studentListNoRankingDiv.innerHTML = '<p>ກຳລັງໂຫຼດຂໍ້ມູນນັກຮຽນ...</p>';
+
+            const { count, error: countError } = await supabase_client
+                .from('students')
+                .select('*', { count: 'exact', head: true });
+
+            if (countError) {
+                console.error('Error counting students:', countError);
+                studentListNoRankingDiv.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການນັບຈຳນວນນັກຮຽນ.</p>';
+                return;
+            }
+
+            const totalPages = studentListRowsPerPage === Infinity ? 1 : Math.ceil(count / studentListRowsPerPage);
+            pageInfoSpan.textContent = `ໜ້າ ${studentListPage} / ${totalPages}`;
+
+            let query = supabase_client.from('students').select('id, name').order('name', { ascending: true });
+
+            if (studentListRowsPerPage !== Infinity) {
+                const from = (page - 1) * studentListRowsPerPage;
+                const to = from + studentListRowsPerPage - 1;
+                query = query.range(from, to);
+            }
+
+            const { data: allSubmissions, error: submissionError } = await supabase_client
+                .from('submissions')
+                .select('student_id, score, submitted_at');
+            
+            const latestScores = new Map();
+            if (allSubmissions) {
+                allSubmissions.forEach(sub => {
+                    const existing = latestScores.get(sub.student_id);
+                    if (!existing || new Date(sub.submitted_at) > new Date(existing.submitted_at)) {
+                        latestScores.set(sub.student_id, { score: sub.score, submitted_at: sub.submitted_at });
+                    }
+                });
+            }
+
+            const { data: students, error } = await query;
+
+            if (error) {
+                console.error('Error fetching students:', error);
+                studentListNoRankingDiv.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນນັກຮຽນ.</p>';
+                return;
+            }
+            
+            prevPageBtn.disabled = studentListPage <= 1;
+            nextPageBtn.disabled = studentListPage >= totalPages;
+            if (studentListRowsPerPage === Infinity) {
+                prevPageBtn.disabled = true;
+                nextPageBtn.disabled = true;
+            }
+            studentListNoRankingDiv.innerHTML = '';
+
+            if (students.length === 0) {
+                studentListNoRankingDiv.innerHTML = '<p>ຍັງບໍ່ມີນັກຮຽນໃນລະບົບ.</p>';
+            }
+
+            let table = `<table id="scores-table" style="font-size: 0.9em;">
+                            <thead><tr><th>ລຳດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th><th>ຄະແນນຫຼ້າສຸດ</th><th>ຈັດການ</th></tr></thead>
+                            <tbody>`;
+            students.forEach((student, index) => {
+                const rowIndex = (studentListPage - 1) * studentListRowsPerPage + index + 1;
+                const studentScore = latestScores.get(student.id);
+                table += `
+                    <tr>
+                        <td>${rowIndex}</td>
+                        <td>${student.name}</td>
+                        <td><strong>${student.id}</strong></td>
+                        <td>${studentScore ? studentScore.score : 'ຍັງບໍ່ມີ'}</td>
+                        <td><button class="delete-student-btn" data-id="${student.id}">ລຶບ</button></td>
+                    </tr>
+                `;
+            });
+            table += '</tbody></table>';
+            studentListNoRankingDiv.innerHTML = table;
+        }
+
+        async function deleteStudent(studentId) {
+            if (confirm(`ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບນັກຮຽນ ID: ${studentId} ອອກຈາກລະບົບ?`)) {
+                const { error } = await supabase_client
+                    .from('students')
+                    .delete()
+                    .eq('id', studentId);
+
+                if (error) {
+                    console.error('Error deleting student:', error);
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບນັກຮຽນ.');
+                } else {
+                    showStatus(`ລຶບນັກຮຽນ ID: ${studentId} ສຳເລັດ!`, 'red');
+                    renderStudentListNoRanking();
+                }
+            }
+        }
+
+        async function saveStudents(newStudentData) {
+            const { data, error } = await supabase_client
+                .from('students')
+                .upsert(newStudentData, { onConflict: 'id' });
+
+            if (error) {
+                console.error('Error importing students:', error);
+                alert(`ເກີດຂໍ້ຜິດພາດ: ${error.message}`);
+            } else {
+                showStatus(`ນຳເຂົ້າ/ອັບເດດ ${newStudentData.length} ລາຍຊື່ສຳເລັດ!`);
+            }
+        }
+
+        function showStatus(message, color = 'green') {
+            statusMessage.textContent = message;
+            statusMessage.style.color = color;
+            setTimeout(() => { statusMessage.textContent = ''; }, 3000);
+        }
+
+        function printRankedSummary() {
+            const printContent = document.getElementById('ranked-summary-content').innerHTML;
+            const printWindow = window.open('', '', 'height=800,width=800');
+            
+            printWindow.document.write('<html><head><title>ສະຫຼຸບຄະແນນ</title>');
+            printWindow.document.write(`
+                <style>
+                    body { font-family: 'Noto Sans Lao', sans-serif; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    h2 { text-align: center; }
+                    h4 { margin-top: 30px; }
+
+                    /* Podium Styles for Printing */
+                    .podium-container {
+                        display: flex;
+                        justify-content: center;
+                        align-items: flex-end;
+                        gap: 15px;
+                        margin-bottom: 40px;
+                        padding: 20px 0;
+                        border-bottom: 2px solid #eee;
+                    }
+                    .podium-spot {
+                        width: 28%; padding: 20px; border-radius: 10px; text-align: center;
+                        border: 2px solid;
+                    }
+                    .podium-spot h3 { margin-top: 0; font-size: 1.5em; }
+                    .podium-spot p { margin: 5px 0; }
+                    .podium-spot .score { font-size: 1.8em; font-weight: bold; margin-top: 10px; }
+                    .rank-1-spot { order: 2; height: 220px; background-color: #fffbeb !important; border-color: #ffd700; }
+                    .rank-2-spot { order: 1; height: 180px; background-color: #f8f9fa !important; border-color: #c0c0c0; }
+                    .rank-3-spot { order: 3; height: 160px; background-color: #fff5f2 !important; border-color: #cd7f32; }
+
+                    /* Table Row Colors for Printing */
+                    tr.rank-1 { background-color: #ffd700 !important; font-weight: bold; }
+                    tr.rank-2 { background-color: #c0c0c0 !important; }
+                    tr.rank-3 { background-color: #cd7f32 !important; }
+                    @media print { 
+                        .rank-1, .rank-2, .rank-3, .rank-1-spot, .rank-2-spot, .rank-3-spot { 
+                            -webkit-print-color-adjust: exact; 
+                            print-color-adjust: exact; 
+                        } 
+                    }
+                </style>
+            `);
+            printWindow.document.write('</head><body>');
+            printWindow.document.write('<h2>ສະຫຼຸບຄະແນນ ແລະ ການຈັດອັນດັບ (ຄະແນນຫຼ້າສຸດ)</h2>');
+            printWindow.document.write(printContent);
+            printWindow.document.write('</body></html>');
+            
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        async function exportStudentListToExcel() {
+            showStatus('ກຳລັງສ້າງໄຟລ໌ Excel...', 'blue');
+
+            const { data: students, error: studentsError } = await supabase_client
+                .from('students')
+                .select('id, name')
+                .order('name', { ascending: true });
+
+            if (studentsError) {
+                console.error('Error fetching students for export:', studentsError);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນນັກຮຽນ.');
+                return;
+            }
+
+            const { data: allSubmissions, error: submissionError } = await supabase_client
+                .from('submissions')
+                .select('student_id, score, submitted_at');
+
+            if (submissionError) {
+                console.error('Error fetching submissions for export:', submissionError);
+                alert('ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນຄະແນນ.');
+                return;
+            }
+
+            const latestScores = new Map();
+            allSubmissions.forEach(sub => {
+                const existing = latestScores.get(sub.student_id);
+                if (!existing || new Date(sub.submitted_at) > new Date(existing.submitted_at)) {
+                    latestScores.set(sub.student_id, { score: sub.score, submitted_at: sub.submitted_at });
+                }
+            });
+
+            const dataToExport = students.map((student, index) => {
+                const studentScore = latestScores.get(student.id);
+                return {
+                    'ລຳດັບ': index + 1,
+                    'ຊື່ ນັກຮຽນ': student.name,
+                    'ID ນັກຮຽນ': student.id,
+                    'ຄະແນນຫຼ້າສຸດ': studentScore ? studentScore.score : 'ຍັງບໍ່ມີ'
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "StudentList");
+            XLSX.writeFile(workbook, "Student_List.xlsx");
+            showStatus('ສົ່ງອອກໄຟລ໌ Excel ສຳເລັດ!', 'green');
+        }
+
+        function updateFormVisibility() {
+            const selectedType = qTypeSelect.value;
+            qImageGroup.style.display = selectedType.includes('image') ? 'block' : 'none';
+            qOptionsGroup.style.display = selectedType.includes('multiple-choice') || selectedType === 'drag-fill-in' ? 'block' : 'none';
+            qAnswerGroup.style.display = !selectedType.includes('matching') ? 'block' : 'none';
+            matchingPairsContainer.style.display = selectedType.includes('matching') ? 'block' : 'none';
+
+            if (selectedType === 'drag-fill-in') {
+                document.getElementById('q-options-label').textContent = 'ຄຳຕອບຕົວຫຼອກ (Distractors, ແຍກດ້ວຍຈຸດ ,):';
+                document.getElementById('q-answer').placeholder = 'ຄຳຕອບ 1, ຄຳຕອບ 2, ...';
+                qOptionsInfo.style.display = 'block';
+                qTextInfo.style.display = 'block';
+            } else {
+                document.getElementById('q-options-label').textContent = 'ຕົວເລືອກ (ແຍກແຕ່ລະຕົວເລືອກດ້ວຍເຄື່ອງໝາຍຈຸດ ,):';
+                document.getElementById('q-answer').placeholder = 'ປ້ອນຄຳຕອບທີ່ຖືກຕ້ອງອັນດຽວ';
+                qOptionsInfo.style.display = 'none';
+                qTextInfo.style.display = 'none';
+            }
+            if (!selectedType.includes('matching')) {
+                document.getElementById('matching-pairs-list').innerHTML = '';
+            }
+        }
+
+        function addMatchingPair() {
+            const list = document.getElementById('matching-pairs-list');
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'matching-pair';
+            const selectedType = qTypeSelect.value;
+
+            let pairHTML = `<input type="text" class="matching-term" placeholder="ຄຳສັບ...">`;
+
+            if (selectedType === 'matching-text-text') {
+                pairHTML += `<input type="text" class="matching-match-text" placeholder="ຄຳອະທິບາຍ...">`;
+            } else if (selectedType === 'matching-text-image') {
+                pairHTML += `<input type="file" class="matching-match-image" accept="image/*">`;
+            }
+
+            pairHTML += `<button type="button" class="delete-pair-btn">X</button>`;
+            pairDiv.innerHTML = pairHTML;
+
+            list.appendChild(pairDiv);
+        }
+
+        addPairBtn.addEventListener('click', addMatchingPair);
+
+        document.getElementById('matching-pairs-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-pair-btn')) {
+                e.target.closest('.matching-pair').remove();
+            }
+        });
+        
+        addQuestionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການເພີ່ມຄຳຖາມນີ້?')) {
+                return;
+            }
+
+            const type = qTypeSelect.value;
+            let newQuestion = { type: type, question: document.getElementById('q-text').value };
+
+            const imageFile = qImageUpload.files[0];
+            if (imageFile) {
+                const fileName = `${Date.now()}_${imageFile.name}`;
+                const { data: uploadData, error: uploadError } = await supabase_client
+                    .storage
+                    .from('question-images')
+                    .upload(fileName, imageFile);
+
+                if (uploadError) {
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການອັບໂຫຼດຮູບພາບ!');
+                    console.error('Image Upload Error:', uploadError);
+                    return;
+                }
+
+                const { data: urlData } = supabase_client
+                    .storage
+                    .from('question-images')
+                    .getPublicUrl(fileName);
+                
+                newQuestion.image_url = urlData.publicUrl;
+            }
+
+            if (type.includes('matching')) {
+                const pairs = [];
+                const pairElements = document.querySelectorAll('.matching-pair');
+                for (const pairEl of pairElements) {
+                    const term = pairEl.querySelector('.matching-term').value;
+                    if (!term) continue;
+
+                    let match;
+                    if (type === 'matching-text-text') {
+                        match = pairEl.querySelector('.matching-match-text').value;
+                    } else if (type === 'matching-text-image') {
+                        const fileInput = pairEl.querySelector('.matching-match-image');
+                        if (fileInput && fileInput.files[0]) {
+                            const matchImageFile = fileInput.files[0];
+                            const matchFileName = `match_${Date.now()}_${matchImageFile.name}`;
+                            const { error: matchUploadError } = await supabase_client
+                                .storage
+                                .from('question-images')
+                                .upload(matchFileName, matchImageFile);
+
+                            if (matchUploadError) {
+                                alert(`ເກີດຂໍ້ຜິດພາດໃນການອັບໂຫຼດຮູບຈັບຄູ່: ${matchUploadError.message}`);
+                                continue;
+                            }
+                            const { data: matchUrlData } = supabase_client
+                                .storage
+                                .from('question-images')
+                                .getPublicUrl(matchFileName);
+                            match = matchUrlData.publicUrl;
+                        }
+                    }
+                    if (match) pairs.push({ term, match });
+                }
+                newQuestion.pairs = pairs;
+
+                if (!newQuestion.question || pairs.length < 2) {
+                    alert('ກະລຸນາປ້ອນຄຳຖາມຫຼັກ ແລະ ເພີ່ມຢ່າງໜ້ອຍ 2 ຄູ່!');
+                    return;
+                }
+            } else {
+                newQuestion.options = document.getElementById('q-options').value.split(',').map(opt => opt.trim()).filter(opt => opt);
+                
+                if (type === 'drag-fill-in') {
+                    newQuestion.answer = document.getElementById('q-answer').value.split(',').map(ans => ans.trim()).filter(ans => ans);
+                    const blanksCount = (newQuestion.question.match(/__BLANK__/g) || []).length;
+                    
+                    if (blanksCount === 0) {
+                        alert('ກະລຸນາໃຊ້ `__BLANK__` ໃນຄຳຖາມເພື່ອລະບຸບ່ອນວ່າງ.');
+                        return;
+                    }
+                    if (blanksCount !== newQuestion.answer.length) {
+                        alert(`ຈຳນວນບ່ອນວ່າງ (${blanksCount}) ແລະ ຈຳນວນຄຳຕອບ (${newQuestion.answer.length}) ບໍ່ເທົ່າກັນ! ກະລຸນາກວດສອບຄືນ.`);
+                        return;
+                    }
+                } else {
+                    newQuestion.answer = document.getElementById('q-answer').value.trim();
+                    if (!newQuestion.question || !newQuestion.answer) {
+                        alert('ກະລຸນາປ້ອນຄຳຖາມ ແລະ ຄຳຕອບ!');
+                        return;
+                    }
+                }
+            }
+
+            if (!newQuestion.question) {
+                alert('ກະລຸນາປ້ອນຄຳຖາມຫຼັກ!');
+                return;
+            }
+
+            const { error } = await supabase_client.from('questions').insert([newQuestion]);
+
+            if (error) {
+                alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກຄຳຖາມ!');
+                console.error('Insert Question Error:', error);
+                return;
+            }
+
+            showStatus('ເພີ່ມຄຳຖາມສຳເລັດ!');
+            addQuestionForm.reset();
+            qImagePreview.style.display = 'none';
+            qImagePreview.src = '';
+            qImageBase64.value = '';
+            qImageUpload.value = '';
+
+            renderQuestions();
+
+            updateFormVisibility();
+        });
+
+        function renderStudentPreview() {
+            if (studentsToImport.length > 0) {
+                let previewHtml = `<h4>ຕົວຢ່າງລາຍຊື່ທີ່ຈະນຳເຂົ້າ (${studentsToImport.length} ຄົນ):</h4>
+                                    <table id="scores-table">
+                                    <thead><tr><th>ລຳດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th><th>ຈັດການ</th></tr></thead>
+                                    <tbody>`;
+                studentsToImport.forEach((student, index) => {
+                    previewHtml += `<tr>
+                                        <td>${index + 1}</td>
+                                        <td>${student.name}</td>
+                                        <td><strong>${student.id}</strong></td>
+                                        <td><button class="delete-preview-btn" data-index="${index}">ລຶບ</button></td>
+                                    </tr>`;
+                });
+                previewHtml += '</tbody></table>';
+                studentsPreviewContainer.innerHTML = previewHtml;
+                confirmImportBtn.style.display = 'block';
+            } else {
+                studentsPreviewContainer.innerHTML = '<p>ບໍ່ມີລາຍຊື່ທີ່ຈະນຳເຂົ້າ.</p>';
+                confirmImportBtn.style.display = 'none';
+            }
+        }
+
+        studentsPreviewContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-preview-btn')) {
+                const index = parseInt(event.target.dataset.index, 10);
+                studentsToImport.splice(index, 1);
+                renderStudentPreview();
+            }
+        });
+
+        qImageUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    qImagePreview.src = e.target.result;
+                    qImagePreview.style.display = 'block';
+                    qImageBase64.value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                
+                studentsToImport = jsonData
+                    .filter(row => row && typeof row[2] !== 'undefined' && row[2] !== null && String(row[2]).trim() !== '')
+                    .map(row => ({
+                        name: row[1] || 'ບໍ່ມີຊື່',
+                        id: String(row[2]).trim()
+                    }));
+
+                renderStudentPreview();
+                if (studentsToImport.length === 0) {
+                    studentsPreviewContainer.innerHTML = '<p style="color: red;">ບໍ່ພົບຂໍ້ມູນລະຫັດນັກຮຽນໃນຖັນທີ 3 ຂອງໄຟລ໌.</p>';
+                    confirmImportBtn.style.display = 'none';
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        confirmImportBtn.addEventListener('click', () => {
+            if (studentsToImport.length > 0) {
+                saveStudents(studentsToImport);
+                studentsToImport = [];
+                studentsPreviewContainer.innerHTML = '';
+                confirmImportBtn.style.display = 'none';
+                renderStudentListNoRanking();
+                document.getElementById('excel-file-input').value = '';
+            }
+        });
+
+        questionsListDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-btn')) {
+                const id = event.target.dataset.id;
+                deleteQuestion(id);
+            }
+        });
+
+        studentListNoRankingDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('delete-student-btn')) {
+                const studentId = event.target.dataset.id;
+                deleteStudent(studentId);
+            }
+        });
+
+        rowsPerPageSelect.addEventListener('change', () => {
+            renderStudentListNoRanking(1);
+        });
+        prevPageBtn.addEventListener('click', () => {
+            if (studentListPage > 1) renderStudentListNoRanking(studentListPage - 1);
+        });
+        nextPageBtn.addEventListener('click', () => {
+            renderStudentListNoRanking(studentListPage + 1);
+        });
+        if (exportStudentListExcelBtn) {
+            exportStudentListExcelBtn.addEventListener('click', exportStudentListToExcel);
+        }
+        if(printSummaryBtn) {
+            printSummaryBtn.addEventListener('click', printRankedSummary);
+        }
+
+        deleteAllStudentsBtn.addEventListener('click', async () => {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນນັກຮຽນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດກູ້ຄືນໄດ້.')) {
+                const { error } = await supabase_client.from('students').delete().neq('id', '0');
+                if (error) {
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບຂໍ້ມູນນັກຮຽນ.');
+                } else {
+                    showStatus('ລຶບຂໍ້ມູນນັກຮຽນທັງໝົດສຳເລັດ!', 'red');
+                    renderStudentListNoRanking();
+                }
+            }
+        });
+
+        deleteAllScoresBtn.addEventListener('click', async () => {
+            if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຂໍ້ມູນຄະແນນທັງໝົດ? ການກະທຳນີ້ບໍ່ສາມາດກູ້ຄືນໄດ້.')) {
+                const { error } = await supabase_client.from('submissions').delete().neq('id', '0');
+                if (error) {
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການລຶບຂໍ້ມູນຄະແນນ.');
+                } else {
+                    showStatus('ລຶບຂໍ້ມູນຄະແນນທັງໝົດສຳເລັດ!', 'red');
+                }
+            }
+        });
+
+        async function updateExamStatus(newStatus, endTime = null) {
+            let operationError;
+
+            if (newStatus === 'OPEN') {
+                const { error } = await supabase_client
+                    .from('quiz_sessions')
+                    .insert([{ status: 'OPEN', start_time: new Date().toISOString() }]);
+                operationError = error;
+            } else {
+                const { data: latestSession, error: fetchError } = await supabase_client
+                    .from('quiz_sessions')
+                    .select('id, status')
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (fetchError || !latestSession) {
+                    operationError = fetchError || new Error("No session found to update.");
+                } else {
+                    const currentStatus = latestSession.status;
+                    const canUpdate = (newStatus === 'IN_PROGRESS' && currentStatus === 'OPEN') || (newStatus === 'CLOSED' && currentStatus === 'IN_PROGRESS');
+
+                    if (canUpdate) {
+                        const { error: updateError } = await supabase_client
+                            .from('quiz_sessions')
+                            .update({ status: newStatus, end_time: endTime })
+                            .eq('id', latestSession.id);
+                        operationError = updateError;
+                    } else {
+                        operationError = new Error(`Invalid state transition from ${currentStatus} to ${newStatus}`);
+                        alert(`ບໍ່ສາມາດປ່ຽນສະຖານະໄດ້: ສະຖານະປັດຈຸບັນແມ່ນ "${currentStatus}".`);
+                    }
+                }
+            }
+            
+            if (operationError) {
+                alert('ເກີດຂໍ້ຜິດພາດໃນການອັບເດດສະຖານະການສອບເສັງ!');
+                console.error('Update exam status error:', operationError);
+            } else {
+                showStatus(`ປ່ຽນສະຖານະເປັນ: ${newStatus} ສຳເລັດ!`);
+                setTimeout(async () => {
+                    updateExamStatusDisplay();
+                    if (newStatus === 'CLOSED') {
+                        const scoresContainer = document.getElementById('exam-control-scores');
+                        scoresContainer.style.display = 'block';
+                        const { data: latestSession } = await supabase_client.from('quiz_sessions').select('id').order('created_at', { ascending: false }).limit(1).single();
+                        if (latestSession) {
+                            renderScores('exam-control-scores-content', latestSession.id);
+                        }
+                    }
+                }, 250);
+            }
+        }
+
+        async function updateExamStatusDisplay() {
+            const display = document.getElementById('exam-status-display');
+            const { data, error } = await supabase_client
+                .from('quiz_sessions')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (error || !data) {
+                display.textContent = 'ບໍ່ສາມາດໂຫຼດສະຖານະໄດ້';
+                display.style.borderColor = 'red';
+                return;
+            }
+
+            const scoresContainer = document.getElementById('exam-control-scores');
+            scoresContainer.style.display = 'none';
+
+            const status = data.status;
+            let statusText = '';
+            let color = '';
+
+            if (status === 'NOT_STARTED') { statusText = 'ປິດຢູ່'; color = '#6c757d'; }
+            else if (status === 'OPEN') { statusText = 'ເປີດຮັບນັກຮຽນ'; color = '#17a2b8'; }
+            else if (status === 'IN_PROGRESS') { statusText = 'ກຳລັງດຳເນີນການ'; color = '#28a745'; }
+            else if (status === 'CLOSED') { statusText = 'ສິ້ນສຸດແລ້ວ'; color = '#dc3545'; }
+
+            display.textContent = `ສະຖານະປັດຈຸບັນ: ${statusText}`;
+            display.style.borderColor = color;
+            display.style.color = color;
+        }
+
+        openExamBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານຕ້ອງການເປີດລະບົບເພື່ອໃຫ້ນັກຮຽນເລີ່ມລັອກອິນເຂົ້າມາ ຫຼືບໍ່?')) {
+                updateExamStatus('OPEN', null);
+            }
+        });
+
+        startExamBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານຕ້ອງການເລີ່ມການສອບເສັງ (45 ນາທີ) ຫຼືບໍ່? ເມື່ອກົດແລ້ວ, ເວລາຈະເລີ່ມນັບຖອຍຫຼັງທັນທີ.')) {
+                const endTime = new Date(new Date().getTime() + 45 * 60000);
+                updateExamStatus('IN_PROGRESS', endTime.toISOString());
+            }
+        });
+
+        stopExamBtn.addEventListener('click', () => {
+            if (confirm('ທ່ານຕ້ອງການຢຸດການສອບເສັງທັນທີ ຫຼືບໍ່? ນັກຮຽນທຸກຄົນຈະຖືກບັງຄັບໃຫ້ສົ່ງຄຳຕອບ.')) {
+                updateExamStatus('CLOSED', new Date().toISOString());
+            }
+        });
+
+        // --- Edit Question Logic ---
+        const editModal = document.getElementById('edit-question-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const editForm = document.getElementById('edit-question-form-modal');
+
+        function addEditMatchingPair(pair = { term: '', match: '' }) {
+            const list = document.getElementById('edit-matching-pairs-list');
+            const pairDiv = document.createElement('div');
+            pairDiv.className = 'matching-pair';
+            const type = document.getElementById('edit-q-type').value;
+
+            let pairHTML = `<input type="text" class="matching-term" placeholder="ຄຳສັບ..." value="${pair.term || ''}">`;
+
+            if (type === 'matching-text-text') {
+                pairHTML += `<input type="text" class="matching-match-text" placeholder="ຄຳອະທິບາຍ..." value="${pair.match || ''}">`;
+            } else if (type === 'matching-text-image') {
+                pairHTML += `<div>
+                                <img src="${pair.match || ''}" style="max-width: 60px; max-height: 60px; display: ${pair.match ? 'block' : 'none'};" class="edit-pair-image-preview">
+                                <input type="file" class="matching-match-image" accept="image/*">
+                                <input type="hidden" class="original-match-url" value="${pair.match || ''}">
+                             </div>`;
+            }
+
+            pairHTML += `<button type="button" class="delete-pair-btn">X</button>`;
+            pairDiv.innerHTML = pairHTML;
+            list.appendChild(pairDiv);
+        }
+
+        async function openEditModal(id) {
+            const { data: q, error } = await supabase_client.from('questions').select('*').eq('id', id).single();
+            if (error || !q) {
+                alert('ບໍ່ສາມາດໂຫຼດຂໍ້ມູນຄຳຖາມເພື່ອແກ້ໄຂໄດ້.');
+                console.error('Error fetching question for edit:', error);
+                return;
+            }
+
+            document.getElementById('edit-q-id').value = q.id;
+            document.getElementById('edit-q-type').value = q.type;
+            document.getElementById('edit-q-text').value = q.question;
+
+            const type = q.type;
+            const isDragFillIn = type === 'drag-fill-in';
+            document.getElementById('edit-q-image-group').style.display = type.includes('image') ? 'block' : 'none';
+            document.getElementById('edit-q-options-group').style.display = type.includes('multiple-choice') || isDragFillIn ? 'block' : 'none';
+            document.getElementById('edit-q-answer-group').style.display = !type.includes('matching') ? 'block' : 'none';
+            document.getElementById('edit-matching-pairs-container').style.display = type.includes('matching') ? 'block' : 'none';
+
+            // Handle form labels and info text based on type
+            if (isDragFillIn) {
+                document.getElementById('edit-q-options-label').textContent = 'ຄຳຕອບຕົວຫຼອກ (Distractors, ແຍກດ້ວຍຈຸດ ,):';
+                document.getElementById('edit-q-options-info').style.display = 'block';
+                document.getElementById('edit-q-text-info').style.display = 'block';
+            } else {
+                document.getElementById('edit-q-options-label').textContent = 'ຕົວເລືອກ (ແຍກດ້ວຍ ,):';
+                document.getElementById('edit-q-options-info').style.display = 'none';
+                document.getElementById('edit-q-text-info').style.display = 'none';
+            }
+
+            const preview = document.getElementById('edit-q-image-preview');
+            const originalImageUrlInput = document.getElementById('edit-q-original-image-url');
+            if (q.image_url) {
+                preview.src = q.image_url;
+                preview.style.display = 'block';
+                originalImageUrlInput.value = q.image_url;
+            } else {
+                preview.style.display = 'none';
+                originalImageUrlInput.value = '';
+            }
+            document.getElementById('edit-q-image-upload').value = '';
+
+            if (type.includes('multiple-choice') || isDragFillIn) {
+                document.getElementById('edit-q-options').value = (q.options || []).join(', ');
+            }
+
+            if (!type.includes('matching')) {
+                const answerValue = Array.isArray(q.answer) ? q.answer.join(', ') : (q.answer || '');
+                document.getElementById('edit-q-answer').value = answerValue;
+            } else {
+                const pairsList = document.getElementById('edit-matching-pairs-list');
+                pairsList.innerHTML = '';
+                if (q.pairs && q.pairs.length > 0) {
+                    q.pairs.forEach(pair => addEditMatchingPair(pair));
+                }
+            }
+
+            editModal.style.display = 'block';
+        }
+
+        questionsListDiv.addEventListener('click', (event) => {
+            if (event.target.classList.contains('edit-btn')) {
+                const id = event.target.dataset.id;
+                openEditModal(id);
+            }
+        });
+
+        document.getElementById('edit-add-pair-btn').addEventListener('click', () => addEditMatchingPair());
+        document.getElementById('edit-matching-pairs-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('delete-pair-btn')) {
+                e.target.closest('.matching-pair').remove();
+            }
+        });
+
+        closeModalBtn.onclick = () => { editModal.style.display = 'none'; }
+        window.onclick = (event) => {
+            if (event.target == editModal) {
+                editModal.style.display = 'none';
+            }
+        }
+
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-q-id').value;
+            const type = document.getElementById('edit-q-type').value;
+
+            let updatedData = {
+                question: document.getElementById('edit-q-text').value,
+                image_url: document.getElementById('edit-q-original-image-url').value // Start with original URL
+            };
+
+            const imageFile = document.getElementById('edit-q-image-upload').files[0];
+            if (imageFile) {
+                const fileName = `${Date.now()}_${imageFile.name}`;
+                const { error: uploadError } = await supabase_client.storage.from('question-images').upload(fileName, imageFile);
+                if (uploadError) {
+                    alert('ເກີດຂໍ້ຜິດພາດໃນການອັບໂຫຼດຮູບພາບຫຼັກ!'); console.error(uploadError); return;
+                }
+                const { data: urlData } = supabase_client.storage.from('question-images').getPublicUrl(fileName);
+                updatedData.image_url = urlData.publicUrl;
+            }
+
+            if (type.includes('multiple-choice') || type === 'drag-fill-in') {
+                updatedData.options = document.getElementById('edit-q-options').value.split(',').map(opt => opt.trim()).filter(opt => opt);
+            }
+
+            if (type === 'drag-fill-in') {
+                updatedData.answer = document.getElementById('edit-q-answer').value.split(',').map(ans => ans.trim()).filter(ans => ans);
+            } else if (!type.includes('matching')) {
+                updatedData.answer = document.getElementById('edit-q-answer').value.trim();
+            } else { // Handle matching types
+                const pairs = [];
+                const pairElements = document.querySelectorAll('#edit-matching-pairs-list .matching-pair');
+                for (const pairEl of pairElements) {
+                    const term = pairEl.querySelector('.matching-term').value;
+                    if (!term) continue;
+
+                    let match;
+                    if (type === 'matching-text-text') {
+                        match = pairEl.querySelector('.matching-match-text').value;
+                    } else if (type === 'matching-text-image') {
+                        const fileInput = pairEl.querySelector('.matching-match-image');
+                        const originalUrl = pairEl.querySelector('.original-match-url').value;
+
+                        if (fileInput && fileInput.files[0]) {
+                            const matchImageFile = fileInput.files[0];
+                            const matchFileName = `match_${Date.now()}_${matchImageFile.name}`;
+                            const { error: matchUploadError } = await supabase_client.storage.from('question-images').upload(matchFileName, matchImageFile);
+
+                            if (matchUploadError) {
+                                alert(`ເກີດຂໍ້ຜິດພາດໃນການອັບໂຫຼດຮູບຈັບຄູ່: ${matchUploadError.message}`);
+                                continue;
+                            }
+                            const { data: matchUrlData } = supabase_client.storage.from('question-images').getPublicUrl(matchFileName);
+                            match = matchUrlData.publicUrl;
+                        } else {
+                            match = originalUrl; // Keep original image if no new one is uploaded
+                        }
+                    }
+                    if (match) pairs.push({ term, match });
+                }
+                updatedData.pairs = pairs;
+                // Clear answer/options for matching types to avoid data inconsistency
+                updatedData.answer = null;
+                updatedData.options = null;
+            }
+
+            const { error } = await supabase_client.from('questions').update(updatedData).eq('id', id);
+
+            if (error) {
+                alert('ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກການແກ້ໄຂ.');
+                console.error('Update error:', error.message);
+            } else {
+                editModal.style.display = 'none';
+                renderQuestions();
+                showStatus('ແກ້ໄຂຄຳຖາມສຳເລັດ!');
+            }
+        });
+
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            sessionStorage.removeItem('admin_logged_in');
+            window.location.href = 'admin_login.html';
+        });
+
+        const submissionsChannel = supabase_client.channel('public:submissions')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'submissions' }, async (payload) => {
+                const newSubmission = payload.new;
+                
+                const { data: student } = await supabase_client
+                    .from('students')
+                    .select('name')
+                    .eq('id', newSubmission.student_id)
+                    .single();
+                
+                const studentName = student ? student.name : 'ບໍ່ພົບຊື່';
+
+                submitSound.play();
+            })
+            .subscribe();
+
+        renderQuestions();
+        renderStudentListNoRanking();
+        updateExamStatusDisplay();
+
+        qTypeSelect.addEventListener('change', updateFormVisibility);
+        updateFormVisibility();
+
+    </script>
+</body>
+</html>

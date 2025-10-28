@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ຜົນການສອບເສັງ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .result-box {
+            text-align: center;
+        }
+        .score-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #007bff;
+            margin: 20px 0;
+        }
+        .student-info {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            color: #fff;
+            background-color: #6c757d;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        /* Styles for ranking table on student page */
+        #scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+        #scores-table th, #scores-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        #scores-table .current-student-row {
+            background-color: #d1ecf1 !important; /* Light blue highlight */
+            font-weight: bold;
+        }
+
+        /* Podium Styles */
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 15px;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        .podium-spot {
+            width: 28%;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid;
+        }
+        .podium-spot h3 { margin-top: 0; font-size: 1.5em; }
+        .podium-spot p { margin: 5px 0; }
+        .podium-spot .score { font-size: 1.8em; font-weight: bold; margin-top: 10px; }
+        .rank-1-spot {
+            order: 2; height: 220px; background-color: #fffbeb; border-color: #ffd700;
+        }
+        .rank-2-spot {
+            order: 1; height: 180px; background-color: #f8f9fa; border-color: #c0c0c0;
+        }
+        .rank-3-spot {
+            order: 3; height: 160px; background-color: #fff5f2; border-color: #cd7f32;
+        }
+        /* Ranking Table Row Colors */
+        #scores-table tr.rank-1 {
+            background-color: #ffd700 !important; /* Gold */
+        }
+        #scores-table tr.rank-2 {
+            background-color: #c0c0c0 !important; /* Silver */
+        }
+        #scores-table tr.rank-3 {
+            background-color: #cd7f32 !important; /* Bronze */
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container result-box">
+        <h1>🎉 ຜົນການສອບເສັງ</h1>
+        <div id="student-info" class="student-info">ກຳລັງໂຫຼດຂໍ້ມູນ...</div>
+        <p>ຄະແນນລວມຂອງທ່ານແມ່ນ:</p>
+        <div id="score-display" class="score-display">--</div>
+
+        <!-- Container for ranked summary -->
+        <div id="ranked-summary-container" style="margin-top: 30px;">
+            <h2>ສະຫຼຸບຄະແນນ ແລະ ການຈັດອັນດັບ</h2>
+            <div id="ranked-summary-content"></div>
+        </div>
+
+        <a href="login.html" class="back-button">🚪 ກັບໄປໜ້າຫຼັກ</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const rankedSummaryContainer = document.getElementById('ranked-summary-container');
+            const studentId = sessionStorage.getItem('current_student_id');
+            if (!studentId) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // 1. ດຶງຄະແນນ ແລະ session_id ຈາກການສົ່ງລ່າສຸດຂອງນັກຮຽນຄົນນີ້
+            const { data: latestSubmission, error: submissionError } = await supabase_client
+                .from('submissions')
+                .select('score, session_id')
+                .eq('student_id', studentId)
+                .order('submitted_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            document.getElementById('student-info').textContent = `ລະຫັດນັກຮຽນ: ${studentId}`;
+            document.getElementById('score-display').textContent = latestSubmission ? latestSubmission.score : 'ບໍ່ພົບຄະແນນ';
+
+            // Function to fetch and render the ranking table
+            async function renderRankingTable(sessionId, studentId) {
+                const container = document.getElementById('ranked-summary-content');
+                container.innerHTML = '<p>ກຳລັງໂຫຼດຂໍ້ມູນການຈັດອັນດັບ...</p>';
+
+                // 1. ດຶງຂໍ້ມູນນັກຮຽນທັງໝົດ
+                const { data: students, error: studentsError } = await supabase_client
+                    .from('students')
+                    .select('id, name');
+
+                if (studentsError) {
+                    container.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນນັກຮຽນ.</p>';
+                    return;
+                }
+
+                // 2. ດຶງຂໍ້ມູນການສົ່ງຄຳຕອບທັງໝົດ
+                const { data: submissions, error: submissionsError } = await supabase_client
+                    .from('submissions')
+                    .select('student_id, score, submitted_at');
+
+                if (submissionsError) {
+                    container.innerHTML = '<p style="color: red;">ເກີດຂໍ້ຜິດພາດໃນການໂຫຼດຂໍ້ມູນຄະແນນ.</p>';
+                    return;
+                }
+
+                // 3. ຊອກຫາຄະແນນຫຼ້າສຸດຂອງນັກຮຽນແຕ່ລະຄົນ
+                const latestScores = new Map();
+                submissions.forEach(sub => {
+                    const existing = latestScores.get(sub.student_id);
+                    if (!existing || new Date(sub.submitted_at) > new Date(existing.submitted_at)) {
+                        latestScores.set(sub.student_id, sub.score);
+                    }
+                });
+
+                // 4. ສ້າງຂໍ້ມູນລວມ ແລະ ຈັດອັນດັບ
+                const rankedData = students.map(student => ({
+                    ...student,
+                    score: latestScores.get(student.id) ?? null
+                })).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+
+                // 5. ສ້າງ Podium ແລະ ຕາຕະລາງ
+                const top3 = rankedData.filter(s => s.score !== null).slice(0, 3);
+                const rank1 = top3[0], rank2 = top3[1], rank3 = top3[2];
+
+                let podiumHtml = '<div class="podium-container">';
+                podiumHtml += rank2 ? `<div class="podium-spot rank-2-spot"><h3>🥈 ອັນດັບ 2</h3><p>${rank2.name}</p><p>ID: ${rank2.id}</p><p class="score">${rank2.score}</p></div>` : '<div></div>';
+                podiumHtml += rank1 ? `<div class="podium-spot rank-1-spot"><h3>🥇 ອັນດັບ 1</h3><p>${rank1.name}</p><p>ID: ${rank1.id}</p><p class="score">${rank1.score}</p></div>` : '<div><p>ຍັງບໍ່ມີຂໍ້ມູນຄະແນນ</p></div>';
+                podiumHtml += rank3 ? `<div class="podium-spot rank-3-spot"><h3>🥉 ອັນດັບ 3</h3><p>${rank3.name}</p><p>ID: ${rank3.id}</p><p class="score">${rank3.score}</p></div>` : '<div></div>';
+                podiumHtml += '</div>';
+
+                let tableHtml = '<h4>ລາຍລະອຽດທຸກອັນດັບ</h4><table id="scores-table"><thead><tr><th>ອັນດັບ</th><th>ຊື່ ນັກຮຽນ</th><th>ID ນັກຮຽນ</th><th>ຄະແນນ</th></tr></thead><tbody>';
+                rankedData.forEach((data, index) => {
+                    const isCurrentUser = data.id === studentId;
+                    let rankClass = '';
+                    if (data.score !== null) {
+                        const rank = rankedData.filter(s => s.score !== null).findIndex(s => s.id === data.id);
+                        if (rank === 0) rankClass = 'rank-1';
+                        else if (rank === 1) rankClass = 'rank-2';
+                        else if (rank === 2) rankClass = 'rank-3';
+                    }
+                    if (isCurrentUser) {
+                        rankClass += ' current-student-row';
+                    }
+                    tableHtml += `<tr class="${rankClass.trim()}"><td>${data.score !== null ? (index + 1) : '-'}</td><td>${data.name}</td><td>${data.id}</td><td>${data.score ?? 'ຍັງບໍ່ມີ'}</td></tr>`;
+                });
+                tableHtml += '</tbody></table>';
+                container.innerHTML = podiumHtml + tableHtml;
+            }
+
+            // Function to check status and decide what to render
+            async function checkAndRender(sessionId, studentId) {
+                const { data: sessionStatus, error } = await supabase_client
+                    .from('quiz_sessions')
+                    .select('status')
+                    .eq('id', sessionId)
+                    .single();
+
+                if (sessionStatus && sessionStatus.status === 'CLOSED') {
+                    rankedSummaryContainer.style.display = 'block'; // ສະແດງ container
+                    renderRankingTable(sessionId, studentId);
+                } else {
+                    rankedSummaryContainer.innerHTML = '<h2>⏳ ກະລຸນາລໍຖ້າ...</h2><p>ຈະສະແດງອັນດັບລວມຫຼັງຈາກການສອບເສັງສິ້ນສຸດລົງ.</p>';
+                }
+            }
+
+            if (latestSubmission && latestSubmission.session_id) {
+                const sessionId = latestSubmission.session_id;
+                // Initial check when page loads
+                await checkAndRender(sessionId, studentId);
+
+                // Subscribe to realtime updates for the session status
+                const channel = supabase_client.channel(`session-status-${sessionId}`)
+                    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'quiz_sessions', filter: `id=eq.${sessionId}` }, payload => {
+                        if (payload.new.status === 'CLOSED') {
+                            rankedSummaryContainer.style.display = 'block'; // ສະແດງ container
+                            renderRankingTable(sessionId, studentId);
+                        }
+                    })
+                    .subscribe();
+            }
+        });
+    </script>
+</body>
+</html>

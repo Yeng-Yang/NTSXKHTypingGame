@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເຂົ້າສູ່ລະບົບ Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .login-container {
+            text-align: center;
+        }
+        .login-input {
+            width: 80%;
+            padding: 12px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container login-container">
+        <h1>🔐 ເຂົ້າສູ່ລະບົບ Admin</h1>
+        <p>ກະລຸນາປ້ອນລະຫັດຜ່ານ Admin</p>
+        <input type="password" id="admin-password-input" class="login-input" placeholder="ລະຫັດຜ່ານ...">
+        <button id="admin-login-btn" class="submit-btn">➡️ ເຂົ້າສູ່ລະບົບ</button>
+        <div id="error-message" class="error-message"></div>
+    </div>
+
+    <script>
+        document.getElementById('admin-login-btn').addEventListener('click', () => {
+            const password = document.getElementById('admin-password-input').value;
+            // ລະຫັດຜ່ານ Admin (ທ່ານສາມາດປ່ຽນໄດ້ຕາມຕ້ອງການ)
+            const correctPassword = 'admin123'; // <--- ປ່ຽນລະຫັດຜ່ານຢູ່ບ່ອນນີ້
+
+            if (password === correctPassword) {
+                sessionStorage.setItem('admin_logged_in', 'true'); // ໝາຍວ່າ Admin ລັອກອິນແລ້ວ
+                window.location.href = 'admin.html';
+            } else {
+                document.getElementById('error-message').textContent = 'ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!';
+            }
+        });
+    </script>
+</body>
+</html>
