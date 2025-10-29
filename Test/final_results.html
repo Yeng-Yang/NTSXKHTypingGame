@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ຜົນການສອບເສັງ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="final_results.css"> <!-- ເພີ່ມ CSS ສະເພາະໜ້ານີ້ -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Phetsarath+OT:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- ໂຫຼດ Script ປ້ອງກັນ -->
+    <script src="protection.js" defer></script>
+
+    <!-- ເພີ່ມ Library SweetAlert2 ເພື່ອການແຈ້ງເຕືອນທີ່ສວຍງາມ -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div class="quiz-container results-container">
+        <h1>🏆 ຜົນການສອບເສັງ</h1>
+        <div class="student-summary" id="student-summary-card">
+            <div class="student-info-wrapper">
+                <div id="student-info">👤 ກຳລັງໂຫຼດ...</div>
+            </div>
+            <div class="score-card">
+                <h2>ຄະແນນຂອງທ່ານ</h2>
+                <p id="score-display" class="score-value">--</p>
+            </div>
+        </div>
+        <div id="ranked-summary-container">
+            <div id="ranked-summary-content"></div>
+        </div>
+
+        <div id="quiz-review-container" style="display: none; margin-top: 40px;">
+            <h2 style="text-align: center; border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px;">🔍 ກວດສອບຄຳຕອບ</h2>
+            <div id="quiz-review-content"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script src="final_results.js"></script>
+</body>
+</html>
