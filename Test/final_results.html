@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ຜົນການສອບເສັງ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Phetsarath+OT:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- ໂຫຼດ Script ປ້ອງກັນ -->
+    <script src="protection.js" defer></script>
+
+    <!-- ເພີ່ມ Library SweetAlert2 ເພື່ອການແຈ້ງເຕືອນທີ່ສວຍງາມ -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- ເພີ່ມ Library Confetti.js ສຳລັບເອັບເຟັກພິເສດ -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+    <div class="quiz-container results-container">
+        <img src="image/logo.png" alt="Trophy" class="trophy-image">
+        <div id="results-header">
+            <h1>🏆 ຜົນການສອບເສັງ</h1>
+        </div>
+        <h2 id="exam-details"></h2>
+        <div id="ranked-summary-container">
+            <div id="ranked-summary-content"></div>
+        </div>
+
+        <div id="quiz-review-container" style="margin-top: 40px;">
+            <div id="quiz-review-content"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script src="final_results.js"></script>
+</body>
+</html>
