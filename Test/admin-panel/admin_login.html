@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ເຂົ້າສູ່ລະບົບ Admin</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Phetsarath+OT:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin_login.css">
+</head>
+<body>
+    <div class="quiz-container login-container">
+        <h1>🔐 ເຂົ້າສູ່ລະບົບ Admin</h1>
+        <p>ກະລຸນາປ້ອນອີເມວ ແລະ ລະຫັດຜ່ານ Admin</p>
+        <input type="email" id="admin-email" class="login-input" placeholder="ອີເມວ..." autocomplete="email">
+        <input type="password" id="admin-password" class="login-input" placeholder="ລະຫັດຜ່ານ...">
+        <button id="admin-login-submit-btn" class="submit-btn">➡️ ເຂົ້າສູ່ລະບົບ</button>
+        <div id="error-message" class="error-message"></div>
+        <div style="margin-top: 15px;">
+            <a href="admin_reset_password.html" class="forgot-password-link">ລືມລະຫັດຜ່ານ?</a>
+        </div>
+    </div>
+
+    <!-- ໂຫຼດ Supabase Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client-admin.js"></script>
+
+    <script src="admin_login.js"></script>
+</body>
+</html>

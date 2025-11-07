@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - ຈັດການບົດກວດກາ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Phetsarath+OT:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+
+    <!-- ເພີ່ມ Library SweetAlert2 ເພື່ອການແຈ້ງເຕືອນທີ່ສວຍງາມ -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- ເພີ່ມ Style ສຳລັບປຸ່ມ 6 ແຈ -->
+    <style>
+        .exam-controls-container {
+            display: flex;
+            gap: 20px; /* ເພີ່ມຊ່ອງວ່າງລະຫວ່າງປຸ່ມ */
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .hexagon-btn {
+            position: relative;
+            width: 180px; /* ກຳນົດຄວາມກວ້າງ */
+            height: 156px; /* ປັບປຸງ: ຄຳນວນຄວາມສູງໃຫ້ຖືກຕ້ອງ (width * 0.866) */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1.3;
+            padding: 0 15px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+            /* ສ້າງຮູບ 6 ແຈ */
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+        .hexagon-btn:hover {
+            transform: scale(1.05); /* ເຮັດໃຫ້ປຸ່ມໃຫຍ່ຂຶ້ນເມື່ອເອົາເມົ້າສ໌ໄປວາງ */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ເພີ່ມ Library SheetJS ເພື່ອຈັດການ Excel -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <!-- ເພີ່ມ Library ສຳລັບການສ້າງ PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- ໂຫຼດ Supabase Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client-admin.js"></script> <!-- ປ່ຽນມາໃຊ້ Client ຂອງ Admin ທີ່ມີສິດທິສູງສຸດ -->
+    <script src="admin_auth.js"></script>
+
+    <script>
+        // ກວດສອບການລັອກອິນທັນທີກ່ອນທີ່ເນື້ອຫາຈະຖືກສະແດງ
+        // ນີ້ເປັນການປ້ອງກັນທີ່ສຳຄັນ!
+        checkAdminAuth();
+    </script>
+
+    <div class="quiz-container">
+
+        <h1>⚙️ Admin Panel - ຈັດການບົດກວດກາ</h1>
+        <a href="#" id="logout-btn">ອອກຈາກລະບົບ</a>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-menu">
+            <button class="tab-link active" onclick="openTab(event, 'exam-control')">🕹️ ຄວບຄຸມການສອບເສັງ</button>
+            <button class="tab-link" onclick="openTab(event, 'create-question')">📝 ສ້າງຄຳຖາມໃໝ່</button>
+            <button class="tab-link" onclick="openTab(event, 'question-list')">📋 ລາຍການຄຳຖາມ</button>
+            <button class="tab-link" onclick="openTab(event, 'student-management')">🧑‍🎓 ຈັດການນັກຮຽນ</button>
+            <button class="tab-link" onclick="openTab(event, 'score-summary')">📊 ສະຫຼຸບຄະແນນ</button>
+            <button class="tab-link" onclick="openTab(event, 'view-reviews')">📄 ເບິ່ງບົດກວດກາ</button>
+        </div>
+
+        <!-- Tab Content: Create Question -->
+        <div id="create-question" class="tab-content">
+            <form id="add-question-form" class="admin-section">
+            <h2>📝 ສ້າງຄຳຖາມໃໝ່</h2>
+            <div class="form-group">
+                <label for="q-type">ປະເພດຄຳຖາມ:</label>
+                <select id="q-type">
+                    <option value="multiple-choice">ປາລະໄນ</option>
+                    <option value="fill-in">ອັດຕະໄນ</option>
+                    <option value="image-multiple-choice">ຮູບພາບປາລະໄນ</option>
+                    <option value="image-fill-in">ຮູບພາບອັດຕະໄນ</option>
+                    <option value="matching-text-text">ຈັບຄູ່ (ຕົວໜັງສື-ຕົວໜັງສື)</option>
+                    <option value="matching-text-image">ຈັບຄູ່ (ຕົວໜັງສື-ຮູບພາບ)</option>
+                    <option value="drag-fill-in">ລາກຄຳຕອບໃສ່ບ່ອນວ່າງ</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="q-class-level">ລະດັບຊັ້ນ:</label>
+                <select id="q-class-level">
+                    <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                    <option value="ປ.1">ປ.1</option>
+                    <option value="ປ.2">ປ.2</option>
+                    <option value="ປ.3">ປ.3</option>
+                    <option value="ປ.4">ປ.4</option>
+                    <option value="ປ.5">ປ.5</option>
+                    <option value="ມ.1">ມ.1</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="q-text">ຄຳຖາມ:</label>
+                <textarea id="q-text" rows="2"></textarea>
+            </div>
+            <div class="form-group" id="q-image-group">
+                <label for="q-image-upload">ອັບໂຫຼດຮູບພາບ (ຖ້າມີ):</label>
+                <input type="file" id="q-image-upload" accept="image/*">
+                <img id="q-image-preview" src="" alt="ຕົວຢ່າງຮູບ" style="max-width: 100px; max-height: 100px; display: none; margin-top: 10px; border-radius: 5px;">
+            </div>
+            <div class="form-group" id="q-options-group">
+                <label for="q-options" id="q-options-label">ຕົວເລືອກ (ແຍກແຕ່ລະຕົວເລືອກດ້ວຍເຄື່ອງໝາຍຈຸດ ,):</label>
+                <input type="text" id="q-options" placeholder="ຕົວເລືອກ ກ, ຕົວເລືອກ ຂ, ຕົວເລືອກ ຄ">
+                <p class="info-text" id="q-options-info" style="display: none;">ສຳລັບຄຳຖາມລາກຄຳຕອບ, ໃຫ້ປ້ອນສະເພາະຄຳຕອບຕົວຫຼອກ (distractors).</p>
+            </div>
+            <div class="form-group" id="q-answer-group">
+                <label for="q-answer">ຄຳຕອບທີ່ຖືກຕ້ອງ:</label>
+                <p class="info-text" id="q-text-info" style="display: none;">ໃນຊ່ອງຄຳຖາມ, ໃຫ້ໃຊ້ `__BLANK__` ເພື່ອສ້າງບ່ອນວ່າງ (ສາມາດໃຊ້ຫຼາຍບ່ອນໄດ້). ໃນຊ່ອງຄຳຕອບ, ໃຫ້ປ້ອນຄຳຕອບຕາມລຳດັບຂອງບ່ອນວ່າງ ແລະ ແຍກດ້ວຍເຄື່ອງໝາຍຈຸດ (,).</p>
+                <input type="text" id="q-answer" placeholder="ປ້ອນຄຳຕອບທີ່ຖືກຕ້ອງອັນດຽວ">
+            </div>
+            <div id="matching-pairs-container" class="form-group" style="display: none;">
+                <label>ຄູ່ຄຳຕອບ:</label>
+                <div id="matching-pairs-list"></div>
+                <button type="button" id="add-pair-btn" style="margin-top: 10px;">+ ເພີ່ມຄູ່</button>
+            </div>
+            <button id="add-q-btn" class="submit-btn" style="background-color: #28a745;">+ ເພີ່ມຄຳຖາມ</button>
+            </form>
+        </div>
+
+        <!-- Tab Content: Student Management -->
+        <div id="student-management" class="tab-content">
+            <div class="admin-section">
+            <h2>📥 ເພີ່ມລາຍຊື່ນັກຮຽນ</h2>
+            <div class="form-group">
+                <label for="excel-file-input">ເລືອກໄຟລ໌ Excel ເພື່ອນຳເຂົ້າລາຍຊື່:</label>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls">
+                <p class="info-text">
+                    <strong>ຄຳແນະນຳ:</strong> ໄຟລ໌ Excel ຄວນມີ <strong>ລະຫັດນັກຮຽນ (ID) ຢູ່ຖັນທີສາມ (Column C)</strong>.
+                </p>
+                <div style="margin-top: 10px;">
+                    <button type="button" id="download-student-template-btn" class="submit-btn" style="background-color: #17a2b8;">📥 ດາວໂຫຼດໄຟລ໌ຕົວຢ່າງ</button>
+                </div>
+            </div>
+            <div id="students-preview-container" style="margin-top: 15px;"></div>
+            <button type="button" id="confirm-import-btn" class="submit-btn" style="display: none; background-color: #28a745; margin-top: 10px;">✅ ຢືນຢັນການນຳເຂົ້າ</button>
+            </div>
+
+            <div class="admin-section">
+                <h2>�️ ເຄື່ອງມືຈັດການຂໍ້ມູນ</h2>
+                <button type="button" id="delete-all-students-btn" class="submit-btn" style="background-color: #dc3545; margin-bottom: 15px;">🗑️ ລຶບຂໍ້ມູນນັກຮຽນທັງໝົດ</button>
+                <button type="button" id="delete-all-scores-btn" class="submit-btn" style="background-color: #fd7e14; margin-bottom: 15px;">🧹 ລຶບຂໍ້ມູນຄະແນນທັງໝົດ</button>
+            </div>
+
+            <div class="admin-section">
+                <h2>📋 ລາຍຊື່ນັກຮຽນໃນລະບົບ</h2>
+                <div id="student-list-controls" style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center;">
+                        <label for="student-list-class-level-filter" style="margin-bottom: 0; margin-right: 5px; white-space: nowrap;">ກັ່ນຕອງ:</label>
+                        <select id="student-list-class-level-filter" class="form-control" style="width: auto;">
+                            <option value="all">ທຸກຊັ້ນຮຽນ</option>
+                            <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                            <option value="ປ.1">ປ.1</option>
+                            <option value="ປ.2">ປ.2</option>
+                            <option value="ປ.3">ປ.3</option>
+                            <option value="ປ.4">ປ.4</option>
+                            <option value="ປ.5">ປ.5</option>
+                            <option value="ມ.1">ມ.1</option>
+                        </select>
+                    </div>
+                    <span>ສະແດງ: </span>
+                    <select id="rows-per-page-select" style="padding: 5px;">
+                        <option value="10" selected>10 ແຖວ</option>
+                        <option value="25">25 ແຖວ</option>
+                        <option value="50">50 ແຖວ</option>
+                        <option value="all">ທັງໝົດ</option>
+                    </select>
+                    <button id="prev-page-btn" class="submit-btn" style="padding: 5px 10px;" disabled>&lt; ກ່ອນໜ້າ</button>
+                    <span id="page-info"></span>
+                    <button id="next-page-btn" class="submit-btn" style="padding: 5px 10px;" disabled>ໜ້າຕໍ່ໄປ &gt;</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button id="export-student-list-excel-btn" class="submit-btn" style="background-color: #28a745;">📤 Export ເປັນ Excel</button>
+                </div>
+                <div id="student-list-no-ranking"></div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Question List -->
+        <div id="question-list" class="tab-content">
+            <div class="admin-section">
+                <h2>📤 ນຳເຂົ້າຄຳຖາມຈາກ Excel</h2>
+                <div class="form-group">
+                    <label for="question-import-input">ເລືອກໄຟລ໌ Excel ເພື່ອນຳເຂົ້າຄຳຖາມ:</label>
+                    <input type="file" id="question-import-input" accept=".xlsx, .xls">
+                </div>
+                <div style="margin-top: 10px;">
+                    <button type="button" id="download-question-template-btn" class="submit-btn" style="background-color: #17a2b8;">📥 ດາວໂຫຼດໄຟລ໌ຕົວຢ່າງ</button>
+                    <button type="button" id="import-questions-btn" class="submit-btn" style="background-color: #28a745; display: none;">✅ ຢືນຢັນການນຳເຂົ້າຄຳຖາມ</button>
+                </div>
+                <p class="info-text" style="margin-top: 15px;">
+                    <strong>ຄຳແນະນຳ:</strong> ຮອງຮັບສະເພາະຄຳຖາມປະເພດ "ປາລະໄນ (multiple-choice)" ແລະ "ອັດຕະໄນ (fill-in)" ທີ່ບໍ່ມີຮູບພາບ.
+                </p>
+            </div>
+            <div class="admin-section">
+                <h2>📚 ລາຍການຄຳຖາມທັງໝົດ</h2>
+                <div id="question-list-controls" style="margin-bottom: 15px; display: flex; align-items: center; gap: 15px;">
+                    <div class="form-group" style="margin-bottom: 0; display: flex; align-items: center;">
+                        <label for="question-list-class-level-filter" style="margin-bottom: 0; margin-right: 5px; white-space: nowrap;">ກັ່ນຕອງ:</label>
+                        <select id="question-list-class-level-filter" class="form-control" style="width: auto;">
+                            <option value="all">ທຸກຊັ້ນຮຽນ</option>
+                            <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                            <option value="ປ.1">ປ.1</option>
+                            <option value="ປ.2">ປ.2</option>
+                            <option value="ປ.3">ປ.3</option>
+                            <option value="ປ.4">ປ.4</option>
+                            <option value="ປ.5">ປ.5</option>
+                            <option value="ມ.1">ມ.1</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" id="delete-all-questions-btn" class="submit-btn" style="background-color: #dc3545; margin-bottom: 15px;">🗑️ ລຶບຄຳຖາມທັງໝົດ</button>
+                <div id="questions-list"></div>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Score Summary -->
+        <div id="score-summary" class="tab-content">
+            <div class="admin-section">
+                <h2>🏆 ສະຫຼຸບຄະແນນ ແລະ ການຈັດອັນດັບ (ຄະແນນຫຼ້າສຸດ)</h2>
+                <div style="margin-bottom: 25px; display: flex; gap: 20px; align-items: flex-end; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="score-summary-class-level">ກັ່ນຕອງຕາມຊັ້ນຮຽນ:</label>
+                        <select id="score-summary-class-level" class="form-control">
+                            <option value="all">ທັງໝົດ</option>
+                            <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                            <option value="ປ.1">ປ.1</option>
+                            <option value="ປ.2">ປ.2</option>
+                            <option value="ປ.3">ປ.3</option>
+                            <option value="ປ.4">ປ.4</option>
+                            <option value="ປ.5">ປ.5</option>
+                            <option value="ມ.1">ມ.1</option>
+                        </select>
+                    </div>
+                    <button id="print-summary-btn" class="submit-btn" style="background-color: #007bff;">🖨️ ພິມ</button>
+                </div>
+                <div id="ranked-summary-content">
+                    <!-- Ranked summary table will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: View Student Reviews -->
+        <div id="view-reviews" class="tab-content">
+            <div class="admin-section">
+                <h2>📄 ເບິ່ງບົດກວດກາຂອງນັກຮຽນ (ບົດຫຼ້າສຸດ)</h2>
+                <div id="review-filters" style="display: flex; gap: 20px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+                    <div class="form-group" style="margin: 0;">
+                        <label for="review-class-level-filter">ກັ່ນຕອງຕາມຊັ້ນຮຽນ:</label>
+                        <select id="review-class-level-filter" class="form-control">
+                            <option value="all">ທັງໝົດ</option>
+                            <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                            <option value="ປ.1">ປ.1</option>
+                            <option value="ປ.2">ປ.2</option>
+                            <option value="ປ.3">ປ.3</option>
+                            <option value="ປ.4">ປ.4</option>
+                            <option value="ປ.5">ປ.5</option>
+                            <option value="ມ.1">ມ.1</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label for="review-student-id-search">ຄົ້ນຫາ ID ນັກຮຽນ:</label>
+                        <input type="text" id="review-student-id-search" class="form-control" placeholder="ປ້ອນ ID...">
+                    </div>
+                     <button id="export-all-reviews-pdf-btn" class="submit-btn" style="background-color: #fd7e14;">📥 Export ລວມເປັນ PDF</button>
+                </div>
+                <div id="student-submissions-list"></div>
+            </div>
+            <div id="student-answer-sheet-container" class="admin-section" style="display: none;"></div>
+        </div>
+
+        <!-- Tab Content: Exam Control -->
+        <div id="exam-control" class="tab-content" style="display: block;">
+            <div class="admin-section">
+                <h2>🕹️ ຄວບຄຸມການສອບເສັງ</h2>
+                <div id="exam-status-display">ກຳລັງໂຫຼດສະຖານະ...</div>
+                <!-- ເພີ່ມ: ພື້ນທີ່ສະແດງໂມງນັບຖອຍຫຼັງ -->
+                <div id="admin-exam-timer"></div>
+
+                <!-- UI ໃໝ່ສຳລັບການຕັ້ງເວລາ -->
+                <div id="exam-config" style="margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+                    <h4 style="margin-top: 0;">ຕັ້ງຄ່າການສອບເສັງ</h4>
+                    <div class="config-grid">
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exam-month">ປະຈຳເດືອນ:</label>
+                            <input type="text" id="exam-month" class="form-control" placeholder="ຕົວຢ່າງ: ເດືອນ 1">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exam-year">ປະຈຳປີ:</label>
+                            <input type="number" id="exam-year" class="form-control">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exam-target-class-level">ຊັ້ນຮຽນທີ່ຈະສອບເສັງ:</label>
+                            <select id="exam-target-class-level" class="form-control">
+                                <option value="all">ທຸກຊັ້ນຮຽນ</option>
+                                <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                                <option value="ປ.1">ປ.1</option>
+                                <option value="ປ.2">ປ.2</option>
+                                <option value="ປ.3">ປ.3</option>
+                                <option value="ປ.4">ປ.4</option>
+                                <option value="ປ.5">ປ.5</option>
+                                <option value="ມ.1">ມ.1</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="exam-end-time">ເວລາສິ້ນສຸດ:</label>
+                            <input type="datetime-local" id="exam-end-time" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Controls -->
+                <div id="manual-controls" style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e9ecef;">
+                    <div class="exam-controls-container">
+                       <button id="open-exam-btn" class="hexagon-btn" style="background-color: #17a2b8;">🟢 ເປີດຮັບນັກຮຽນ</button>
+                       <button id="start-exam-btn" class="hexagon-btn" style="background-color: #28a745;">🚀 ເລີ່ມສອບເສັງ</button>
+                       <button id="stop-exam-btn" class="hexagon-btn" style="background-color: #dc3545;">🛑 ຢຸດການສອບເສັງ<br>ທັນທີ</button>
+                       <button id="close-session-btn" class="hexagon-btn" style="background-color: #6c757d;">🚪 ປິດຫ້ອງເສັງ<br>(ຫຼັງສອບເສັງແລ້ວ)</button>
+                    </div>
+                </div>
+                <p class="info-text" style="text-align: center; margin-top: 15px;"><strong>ໝາຍເຫດ:</strong> ເມື່ອກົດ "ເລີ່ມສອບເສັງ", ລະບົບຈະເລີ່ມຈັບເວລາ ແລະ ຈະສິ້ນສຸດໃນເວລາທີ່ກຳນົດ. ນັກຮຽນຈະຖືກບັງຄັບໃຫ້ສົ່ງຄຳຕອບເມື່ອຮອດເວລາ.</p>
+            </div>
+            <div id="exam-control-scores" class="admin-section" style="display: none;">
+                 <h2>📊 ສະຫຼຸບຄະແນນຫຼັງສິ້ນສຸດ</h2>
+                 <div id="exam-control-scores-content"></div>
+            </div>
+        </div>
+
+        <!-- Modal for Editing Questions -->
+        <div id="edit-question-modal" class="modal">
+            <div class="modal-content">
+                <h2>✏️ ແກ້ໄຂຄຳຖາມ</h2>
+                <form id="edit-question-form-modal">
+                    <input type="hidden" id="edit-q-id">
+                    <div class="form-group">
+                        <label for="edit-q-type">ປະເພດຄຳຖາມ:</label>
+                        <select id="edit-q-type" disabled>
+                            <option value="multiple-choice">ປາລະໄນ</option>
+                            <option value="fill-in">ອັດຕະໄນ</option>
+                            <option value="image-multiple-choice">ຮູບພາບປາລະໄນ</option>
+                            <option value="image-fill-in">ຮູບພາບອັດຕະໄນ</option>
+                            <option value="matching-text-text">ຈັບຄູ່ (ຕົວໜັງສື-ຕົວໜັງສື)</option>
+                            <option value="matching-text-image">ຈັບຄູ່ (ຕົວໜັງສື-ຮູບພາບ)</option>
+                            <option value="drag-fill-in">ລາກຄຳຕອບໃສ່ບ່ອນວ່າງ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-q-class-level">ລະດັບຊັ້ນ:</label>
+                        <select id="edit-q-class-level">
+                            <option value="ອານຸບານ 3">ອານຸບານ 3</option>
+                            <option value="ປ.1">ປ.1</option>
+                            <option value="ປ.2">ປ.2</option>
+                            <option value="ປ.3">ປ.3</option>
+                            <option value="ປ.4">ປ.4</option>
+                            <option value="ປ.5">ປ.5</option>
+                            <option value="ມ.1">ມ.1</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-q-text">ຄຳຖາມ:</label>
+                        <textarea id="edit-q-text" rows="2"></textarea>
+                    </div>
+                    <div class="form-group" id="edit-q-image-group">
+                        <label>ຮູບພາບປັດຈຸບັນ:</label>
+                        <img id="edit-q-image-preview" src="" style="max-width: 100px; max-height: 100px; display: none; margin-bottom: 10px;">
+                        <label for="edit-q-image-upload">ປ່ຽນຮູບພາບ (ເລືອກຖ້າຕ້ອງການປ່ຽນ):</label>
+                        <input type="file" id="edit-q-image-upload" accept="image/*">
+                        <input type="hidden" id="edit-q-original-image-url">
+                    </div>
+                    <div class="form-group" id="edit-q-options-group">
+                        <label for="edit-q-options" id="edit-q-options-label">ຕົວເລືອກ (ແຍກດ້ວຍ ,):</label>
+                        <input type="text" id="edit-q-options">
+                        <p class="info-text" id="edit-q-options-info" style="display: none;">ສຳລັບຄຳຖາມລາກຄຳຕອບ, ໃຫ້ປ້ອນສະເພາະຄຳຕອບຕົວຫຼອກ (distractors).</p>
+                    </div>
+                    <div class="form-group" id="edit-q-answer-group">
+                        <label for="edit-q-answer">ຄຳຕອບທີ່ຖືກຕ້ອງ:</label>
+                        <p class="info-text" id="edit-q-text-info" style="display: none;">ໃນຊ່ອງຄຳຖາມ, ໃຫ້ໃຊ້ `__BLANK__` ເພື່ອສ້າງບ່ອນວ່າງ. ໃນຊ່ອງຄຳຕອບ, ໃຫ້ປ້ອນຄຳຕອບຕາມລຳດັບຂອງບ່ອນວ່າງ ແລະ ແຍກດ້ວຍເຄື່ອງໝາຍຈຸດ (,).</p>
+                        <input type="text" id="edit-q-answer">
+                    </div>
+                    <div id="edit-matching-pairs-container" class="form-group" style="display: none;">
+                        <label>ຄູ່ຄຳຕອບ:</label>
+                        <div id="edit-matching-pairs-list"></div>
+                        <button type="button" id="edit-add-pair-btn" style="margin-top: 10px;">+ ເພີ່ມຄູ່</button>
+                    </div>
+                    <button type="submit" class="submit-btn">ບັນທຶກການປ່ຽນແປງ</button>
+                    <button type="button" id="close-modal-btn" class="submit-btn" style="background-color: #6c757d; margin-top: 10px;">ຍົກເລີກ</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

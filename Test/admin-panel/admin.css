@@ -1,0 +1,618 @@
+body {
+    /* ປ່ຽນພື້ນຫຼັງໃຫ້ເປັນສີທີ່ສະອາດຕາ ເພື່ອໃຫ້ເນື້ອຫາໂດດເດັ່ນ */
+    font-family: 'Phetsarath OT', sans-serif; /* << ແກ້ໄຂ: ກຳນົດຟອນຫຼັກ */
+    background-color: #f4f7f9;
+    padding: 20px 0; /* ເພີ່ມຊ່ອງວ່າງເທິງ-ລຸ່ມ */
+}
+.quiz-container {
+    /* ເພີ່ມຄວາມກວ້າງສູງສຸດເພື່ອຮອງຮັບຈໍໃຫຍ່ */
+    max-width: 1200px;
+    background-color: #ffffff; /* ປ່ຽນເປັນສີຂາວທຶບ */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* ເພີ່ມເງົາໃຫ້ໂດດເດັ່ນ */
+}
+
+.admin-section {
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef; /* ປ່ຽນເປັນເສັ້ນຂອບອ່ອນໆ */
+    padding: 25px; /* ເພີ່ມ padding */
+    background-color: #fff;
+    border-radius: 8px; /* ເພີ່ມຄວາມມົນ */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* ເພີ່ມເງົາອ່ອນໆ */
+}
+.admin-section h2 {
+    color: #343a40; /* ປັບສີຫົວຂໍ້ໃຫ້ເຂັ້ມຂຶ້ນ */
+    border-bottom: 2px solid #007bff; /* ເພີ່ມເສັ້ນຂີດກ້ອງ */
+    padding-bottom: 10px;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.info-text {
+    font-size: 0.9em;
+    color: #666;
+}
+
+#scores-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+#scores-table th, #scores-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+#scores-table th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+}
+/* ເພີ່ມສີສະຫຼັບແຖວໃຫ້ຕາຕະລາງ */
+#scores-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+
+#questions-list .question-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    background-color: #f9f9f9;
+}
+#questions-list .question-item:hover {
+    background-color: #f1f1f1;
+}
+
+#questions-list .delete-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+#questions-list .delete-btn:hover {
+    background-color: #c82333;
+}
+#questions-list .edit-btn {
+    background-color: #ffc107;
+    color: #212529;
+    margin-right: 5px;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+#questions-list .edit-btn:hover {
+    background-color: #e0a800;
+}
+.delete-student-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+.delete-student-btn:hover {
+    background-color: #c82333;
+}
+.delete-preview-btn {
+    background-color: #ffc107;
+    color: #212529;
+    border: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+.matching-pair {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 5px;
+}
+.matching-pair input[type="text"] {
+    flex: 1;
+}
+.matching-pair input[type="file"] {
+    flex: 1; /* ເພີ່ມຄຸນສົມບັດນີ້ເພື່ອໃຫ້ຊ່ອງອັບໂຫຼດໄຟລ໌ຂະຫຍາຍເຕັມພື້ນທີ່ */
+    padding: 5px; /* ເພີ່ມ padding ເພື່ອຄວາມສວຍງາມ */
+}
+.matching-pair .delete-pair-btn {
+    background-color: #ffc107;
+    color: #333;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Podium Styles */
+.podium-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 15px;
+    margin-bottom: 40px;
+    padding: 20px 0;
+    border-bottom: 2px solid #eee;
+}
+.podium-spot {
+    width: 28%;
+    padding: 20px;
+    position: relative; /* ເພີ່ມ position relative ເພື່ອໃຫ້ confetti ຢູ່ພາຍໃນ */
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid;
+}
+.podium-spot h3 { margin-top: 0; font-size: 1.5em; }
+.podium-spot p { margin: 5px 0; }
+.podium-spot .score { font-size: 1.8em; font-weight: bold; margin-top: 10px; }
+.rank-1-spot {
+    order: 2; height: 250px; background-color: #fffbeb; border-color: #ffd700; margin-bottom: 40px; /* ຍູ້ໃຫ້ຕີນສູງຂຶ້ນ */
+}
+.rank-2-spot {
+    order: 1; height: 170px; background-color: #f8f9fa; border-color: #c0c0c0; /* ປັບຄວາມສູງ */
+}
+.rank-3-spot {
+    order: 3; height: 170px; background-color: #fff5f2; border-color: #cd7f32; /* ປັບຄວາມສູງໃຫ້ເທົ່າອັນດັບ 2 */
+}
+
+/* Tab Menu Styles */
+.tab-menu {
+    display: flex;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 30px; /* ເພີ່ມຊ່ອງວ່າງ */
+}
+.tab-link {
+    padding: 12px 25px; /* ປັບຂະໜາດ */
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    font-size: 1em;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; /* ໃຫ້ເສັ້ນລຸ່ມຕິດກັບເສັ້ນຂອບ */
+    transition: all 0.3s ease; /* ເພີ່ມ animation */
+    color: #495057;
+}
+.tab-link:hover {
+    background-color: #f1f1f1;
+    color: #0056b3;
+}
+.tab-link.active {
+    border-bottom: 3px solid #007bff;
+    font-weight: bold;
+}
+.tab-content {
+    display: none; /* Hide all content by default */
+}
+
+/* Ranking Table Row Colors */
+#scores-table tr.rank-1 {
+    background-color: #ffd700 !important; /* Gold */
+    font-weight: bold;
+}
+#scores-table tr.rank-2 {
+    background-color: #c0c0c0 !important; /* Silver */
+}
+#scores-table tr.rank-3 {
+    background-color: #cd7f32 !important; /* Bronze */
+}
+#scores-table tr.rank-other {
+    background-color: #f8f9fa;
+}
+
+/* Logout Button Style */
+#logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+/* View Answers Link Style */
+#view-answers-link {
+    position: absolute;
+    top: 20px;
+    right: 150px; /* Adjust position to not overlap logout button */
+    background-color: #17a2b8;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9em;
+}
+
+
+/* Exam Control Styles */
+#exam-status-display {
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    border: 2px solid;
+}
+
+/* Modal Styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 700px;
+    border-radius: 10px;
+    position: relative;
+}
+
+/* ເພີ່ມ: ສະໄຕລ໌ສຳລັບໂມງນັບຖອຍຫຼັງຂອງ Admin */
+#admin-exam-timer {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #dc3545;
+    text-align: center;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: none; /* ເຊື່ອງໄວ້ກ່ອນ, ຈະສະແດງຜ່ານ JavaScript ເມື່ອເລີ່ມສອບເສັງ */
+    transition: all 0.3s ease;
+}
+
+/* ເພີ່ມ: ສະໄຕລ໌ສຳລັບການຈັດວາງສ່ວນຕັ້ງຄ່າ */
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: end;
+    margin-top: 15px; /* ເພີ່ມຊ່ອງວ່າງເທິງ ເພື່ອແຍກອອກຈາກຫົວຂໍ້ */
+}
+
+.config-grid .form-group {
+    margin-bottom: 0; /* ເອົາ margin-bottom ເກົ່າອອກ */
+}
+
+/* Styles for Student Answer Display */
+.student-answer-block {
+    border: 1px solid #dee2e6;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.student-answer-block h3 {
+    color: #0056b3;
+    margin-top: 0;
+}
+.answer-item {
+    border-bottom: 1px dashed #e9ecef;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+.answer-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+.answer-image-preview {
+    max-width: 150px;
+    max-height: 150px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+/* Styles for matching question results table */
+.matching-answer-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+.matching-answer-table td {
+    padding: 5px;
+    vertical-align: middle;
+    border: none;
+}
+.matching-answer-table td:nth-child(2) {
+    text-align: center;
+}
+.matching-result-img {
+    max-width: 80px;
+    max-height: 80px;
+    vertical-align: middle;
+    border-radius: 4px;
+}
+
+/* Announcement Box on Student Page */
+#announcement-box {
+    margin-top: 30px;
+    padding: 15px;
+    border: 1px solid #17a2b8;
+    background-color: #f0f9ff;
+    border-radius: 8px;
+    color: #0c5460;
+}
+.view-answers-btn {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+.view-answers-btn:hover {
+    background-color: #138496;
+}
+
+.answer-item {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border-left: 5px solid;
+}
+
+.answer-item.correct {
+    background-color: #e9f7ef;
+    border-color: #28a745;
+}
+
+.answer-item.incorrect {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+}
+
+.answer-item p {
+    margin: 5px 0;
+}
+
+.answer-image-preview {
+    max-width: 150px;
+    max-height: 150px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    display: block;
+}
+
+/* Styles for new answer item header */
+.answer-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px; /* Add space between question and correctness text */
+}
+
+.answer-item-header .question-title {
+    margin: 0;
+    flex-grow: 1; /* Allow question to take up available space */
+}
+
+.answer-item-header .correctness-text {
+    font-weight: bold;
+    white-space: nowrap; /* Prevent "ຖືກຕ້ອງ" / "ຜິດ" from wrapping */
+    flex-shrink: 0; /* Prevent this element from shrinking */
+}
+
+/* === Styles for Direct Review Sheet Display === */
+.review-sheet-block {
+    border: 1px solid #dee2e6;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.review-sheet-block h3 {
+    color: #0056b3;
+    margin-top: 0;
+}
+
+/* Remove modal-specific styles that are no longer needed or might conflict */
+.review-modal, .review-modal-content {
+    /* These are no longer used for the main display */
+    display: none !important; 
+}
+
+/* === New Styles for Review Display === */
+
+/* Container for multiple choice options */
+.review-options-container {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Individual option style */
+.review-option {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Style for the correct option (always green) */
+.review-option.correct-option {
+    background-color: #d4edda; /* Light green */
+    border-color: #c3e6cb;
+    color: #155724;
+    font-weight: bold;
+}
+
+/* Style for the student's incorrect choice (red) */
+.review-option.incorrect-student-choice {
+    background-color: #f8d7da; /* Light red */
+    border-color: #f5c6cb;
+    color: #721c24;
+    text-decoration: line-through;
+}
+
+/* Style for "unanswered" text */
+.unanswered-text {
+    color: #856404; /* Brownish yellow */
+    background-color: #fff3cd;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+/* Style for inline correct answer text (e.g., for fill-in-the-blank) */
+.correct-text-inline {
+    font-weight: bold;
+    color: #155724;
+}
+
+/* Styles for Matching Review */
+.matching-review-container {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.matching-review-row {
+    display: grid; /* ປ່ຽນເປັນ grid */
+    grid-template-columns: 1fr 1.2fr 1.2fr; /* ປັບອັດຕາສ່ວນຖັນ */
+    gap: 8px; /* ປັບຊ່ອງວ່າງ */
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+.matching-review-row:last-child {
+    border-bottom: none;
+}
+.matching-review-header {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1.2fr;
+    gap: 8px;
+    font-weight: bold;
+    color: #495057;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #dee2e6;
+}
+.review-term-item {
+    font-weight: bold;
+    background-color: #e9ecef;
+    padding: 10px;
+    border-radius: 4px;
+}
+.review-user-answer, .review-correct-answer-cell {
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 50px; /* ກຳນົດຄວາມສູງຂັ້ນຕໍ່າ */
+}
+.review-user-answer {
+    border: 1px solid #ccc;
+    background-color: #fff;
+}
+.review-correct-answer-cell {
+    font-weight: bold;
+    color: #155724;
+}
+.review-match-img {
+    max-height: 50px;
+    max-width: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+code {
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+code.correct-option {
+    background-color: #d4edda;
+    color: #155724;
+}
+code.incorrect-student-choice {
+    background-color: #f8d7da;
+    color: #721c24;
+    text-decoration: line-through;
+}
+
+/* === Styles for Student Result Wrapper in Admin View === */
+.student-result-wrapper {
+    border: 2px solid #007bff;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 40px;
+    background-color: #f8f9fa;
+}
+
+.student-result-wrapper .podium-container {
+    transform: scale(0.9); /*  ย่อส่วน podium เล็กน้อย */
+    margin-bottom: 20px;
+}
+
+.student-result-wrapper .current-student-summary {
+    text-align: center;
+    padding: 15px;
+    margin: 15px auto 30px auto;
+    background-color: #e9f5ff;
+    border-left: 5px solid #007bff;
+    border-radius: 8px;
+    max-width: 600px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 1.1em;
+}
+
+.student-result-wrapper .current-student-summary .score-value {
+    color: #0056b3;
+    font-size: 1.2em;
+}

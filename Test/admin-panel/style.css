@@ -1,0 +1,196 @@
+/* ໃຊ້ຟອນພາສາລາວ ແລະ ຈັດໜ້າເວັບ */
+body {
+    font-family: 'Phetsarath OT', sans-serif;
+    background-color: #f4f7f9; /* ປ່ຽນມາໃຊ້ສີພື້ນຫຼັງທີ່ສະອາດຕາ */
+    /* background-image: url('image/background.png'); */ /* ປິດການໃຊ້ຮູບ */
+    /* background-size: cover; */
+    /* background-position: center; */
+    /* background-attachment: fixed; */
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+}
+
+/* ກ່ອງຫຼັກຂອງບົດກວດກາ */
+.quiz-container {
+    background-color: rgba(255, 255, 255, 0.95); /* ເພີ່ມ Overlay ສີຂາວໂປ່ງໃສ */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+}
+
+h1 {
+    color: #0056b3;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* ຮູບແບບຂອງແຕ່ລະຄຳຖາມ */
+.question-block {
+    margin-bottom: 25px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fafafa;
+    transition: background-color 0.3s;
+}
+
+.question-block.correct {
+    background-color: #e9f7ef;
+    border-color: #28a745;
+}
+
+.question-block.incorrect {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+}
+
+.question-text {
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+/* ຮູບແບບຂອງຮູບພາບໃນຄຳຖາມ */
+.question-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ເພີ່ມ: ສະໄຕລ໌ສຳລັບສະແດງລະດັບຊັ້ນຂອງຄຳຖາມ */
+.question-class-level {
+    color: #007bff;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-right: 8px;
+}
+
+/* ຕົວເລືອກຂອງຄຳຖາມປາລະໄນ */
+.options-container label {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.options-container label:hover {
+    background-color: #e9ecef;
+}
+
+/* ຊ່ອງປ້ອນຂໍ້ມູນສຳລັບຄຳຖາມອັດຕະໄນ */
+.fill-in-input {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Noto Sans Lao', sans-serif;
+    font-size: 1em;
+}
+
+/* ປຸ່ມສົ່ງຄຳຕອບ */
+#submit-btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 20px;
+}
+
+#submit-btn:hover {
+    background-color: #0056b3;
+}
+
+/* ກ່ອງສະແດງຜົນ */
+#result-container {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+/* Styles for Matching Questions */
+.matching-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+.matching-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1; /* ໃຫ້ແຕ່ລະຖັນມີຂະໜາດເທົ່າກັນ */
+}
+.matching-item {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    display: flex; /* ໃຊ້ Flexbox ເພື່ອຈັດເນື້ອຫາ */
+    align-items: center;
+    justify-content: center;
+    height: 65px; /* ກຳນົດຄວາມສູງຄົງທີ່ */
+    box-sizing: border-box; /* ໃຫ້ແນ່ໃຈວ່າ padding ແລະ border ຖືກລວມໃນຄວາມສູງ */
+}
+.term-item {
+    background-color: #e9ecef;
+    justify-content: flex-start; /* ຈັດຂໍ້ຄວາມໃຫ້ຊິດຊ້າຍ */
+}
+.match-item {
+    cursor: grab;
+}
+.match-item:active {
+    cursor: grabbing;
+}
+.match-item img {
+    max-width: 100%;
+    max-height: 100%; /* ໃຫ້ຮູບເຕັມຄວາມສູງຂອງກ່ອງ */
+    object-fit: contain; /* ຮັກສາອັດຕາສ່ວນຂອງຮູບ */
+    pointer-events: none; /* Prevents image from being dragged instead of the div */
+}
+.matching-drop-zone {
+    border: 2px dashed #007bff;
+    border-radius: 5px;
+    height: 65px; /* ກຳນົດຄວາມສູງໃຫ້ເທົ່າກັບລາຍການອື່ນ */
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* Style for Student Timer */
+#quiz-timer {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    background-color: #0056b3;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+}

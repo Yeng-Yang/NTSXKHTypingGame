@@ -1,0 +1,103 @@
+/* File: student_answers.css */
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-controls .form-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* New Style for Student Answer Card */
+.student-answer-card {
+    border: 1px solid #dee2e6;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Answer Details Styles */
+.answer-details-header {
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.answer-details-header h2 {
+    margin-top: 0;
+    color: #343a40;
+}
+
+/* New Style for each submission block */
+.submission-block {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 20px;
+    background-color: #f8f9fa;
+}
+.submission-block h4 {
+    margin-top: 0;
+}
+.answer-item {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fdfdfd;
+}
+
+.answer-item.correct {
+    border-left: 5px solid #28a745; /* Green for correct */
+}
+
+.answer-item.incorrect {
+    border-left: 5px solid #dc3545; /* Red for incorrect */
+}
+
+.answer-item p {
+    margin: 8px 0;
+}
+
+.answer-image-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.matching-answer-table {
+    width: auto;
+    border-collapse: collapse;
+    margin-top: 5px;
+}
+.matching-answer-table td {
+    padding: 5px 10px 5px 0;
+    vertical-align: middle;
+    border: none;
+}
+.matching-result-img {
+    max-width: 80px;
+    max-height: 80px;
+    vertical-align: middle;
+    border-radius: 4px;
+}
