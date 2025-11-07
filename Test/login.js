@@ -31,12 +31,12 @@ loginBtn.addEventListener('click', async () => {
         return;
     }
 
-    // 2. ກວດຫາຫ້ອງສອບເສັງທີ່ກຳລັງເປີດຮັບ (OPEN) ຫຼື ກຳລັງດຳເນີນ (IN_PROGRESS)
+    // 2. ກວດຫາຫ້ອງສອບເສັງທີ່ກຳລັງເປີດຮັບ (OPEN), ກຳລັງດຳເນີນ (IN_PROGRESS), ຫຼື ປະກາດຄະແນນ (RESULTS_AVAILABLE)
     // ປັບປຸງເງື່ອນໄຂ: ຕ້ອງເປັນຫ້ອງສອບເສັງຂອງຊັ້ນຮຽນນັກຮຽນຄົນນັ້ນ ຫຼື ຫ້ອງສຳລັບທຸກຄົນ ('all')
     const { data: activeSession, error: sessionError } = await supabase_client
         .from('quiz_sessions')
         .select('id, status, target_class_level')
-        .in('status', ['OPEN', 'IN_PROGRESS'])
+        .in('status', ['OPEN', 'IN_PROGRESS', 'RESULTS_AVAILABLE']) // ເພີ່ມ RESULTS_AVAILABLE
         .or(`target_class_level.eq.${student.class_level},target_class_level.eq.all`) // ກວດສອບຊັ້ນຮຽນໃຫ້ກົງກັນ ຫຼື ເປັນ 'all'
         .order('created_at', { ascending: false })
         .limit(1)
@@ -51,8 +51,8 @@ loginBtn.addEventListener('click', async () => {
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
- 
-        if (latestSession && (latestSession.status === 'CLOSED' || latestSession.status === 'RESULTS_AVAILABLE')) {
+
+        if (latestSession && latestSession.status === 'CLOSED') { // ປັບປຸງ: ບລັອກສະເພາະເມື່ອເປັນ CLOSED
             // ຖ້າຫ້ອງລ່າສຸດປິດໄປແລ້ວ
             Swal.fire({
                 title: 'ບໍ່ສາມາດເຂົ້າລະບົບໄດ້',
@@ -79,8 +79,14 @@ loginBtn.addEventListener('click', async () => {
     sessionStorage.setItem('current_session_id', activeSession.id);
     sessionStorage.setItem('current_class_level', student.class_level); // ເກັບຊັ້ນຮຽນໄວ້ໃນ sessionStorage
 
+    // ເພີ່ມ: ຖ້າສະຖານະເປັນ RESULTS_AVAILABLE, ໃຫ້ໄປໜ້າຜົນຄະແນນເລີຍ
+    if (activeSession.status === 'RESULTS_AVAILABLE') {
+        window.location.href = 'final_results.html';
+        return;
+    }
+
     // ປັບປຸງ: ກວດສອບວ່ານັກຮຽນໄດ້ສົ່ງຄຳຕອບໃນ session ນີ້ແລ້ວບໍ່
-    if (activeSession.status === 'IN_PROGRESS') { // ບໍ່ຈຳເປັນຕ້ອງກວດ RESULTS_AVAILABLE ແລ້ວ
+    if (activeSession.status === 'IN_PROGRESS') {
         const { data: existingSubmission, error: submissionCheckError } = await supabase_client
             .from('submissions')
             .select('id')
