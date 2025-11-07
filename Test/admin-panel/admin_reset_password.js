@@ -14,19 +14,23 @@ sendBtn.addEventListener('click', async () => {
     messageArea.style.color = 'blue';
     sendBtn.disabled = true;
 
-    // ໝາຍເຫດ: ທ່ານຕ້ອງໄປຕັ້ງຄ່າ URL ນີ້ໃນ Supabase Dashboard > Authentication > URL Configuration
-    // ໃຫ້ເປັນ URL ຂອງເວັບໄຊທ໌ອອນລາຍຂອງທ່ານ. ຕົວຢ່າງ: https://your-site.com/admin_update_password.html
-    // ສຳລັບການທົດລອງໃນຄອມ, ທ່ານສາມາດໃຊ້ URL ຂອງ Live Server ໄດ້.
-    const { data, error } = await supabase_client.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + '/admin_update_password.html',
+    // ປ່ຽນມາໃຊ້ signInWithOtp ເພື່ອສົ່ງລະຫັດ 6 ຕົວເລກ
+    // shouldCreateUser: false ໝາຍຄວາມວ່າຈະບໍ່ສ້າງ user ໃໝ່ຖ້າອີເມວນີ້ບໍ່ມີໃນລະບົບ
+    const { data, error } = await supabase_client.auth.signInWithOtp({
+        email: email,
+        options: {
+            shouldCreateUser: false,
+        },
     });
 
     if (error) {
         messageArea.textContent = 'ເກີດຂໍ້ຜິດພາດ: ' + error.message;
         messageArea.style.color = 'red';
     } else {
-        messageArea.textContent = 'ສົ່ງລິ້ງສຳເລັດ! ກະລຸນາກວດສອບອີເມວຂອງທ່ານ (ທັງໃນ Inbox ແລະ Junk/Spam).';
-        messageArea.style.color = 'green';
+        // ຖ້າສົ່ງ OTP ສຳເລັດ, ໃຫ້ພາໄປໜ້າຢືນຢັນ OTP ພ້ອມກັບສົ່ງອີເມວໄປນຳ
+        // ບັນທຶກເວລາທີ່ສົ່ງ OTP ເພື່ອໃຊ້ໃນການຄຳນວນໂມງນັບຖອຍຫຼັງ
+        sessionStorage.setItem('otp_request_timestamp', Date.now());
+        window.location.href = `admin_verify_otp.html?email=${encodeURIComponent(email)}`;
     }
     sendBtn.disabled = false;
 });

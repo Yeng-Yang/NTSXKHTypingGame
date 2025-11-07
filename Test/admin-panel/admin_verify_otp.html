@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ຢືນຢັນ OTP</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Phetsarath+OT:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin_login.css">
+</head>
+<body>
+
+    <div class="quiz-container login-container">
+        <h1>🔑 ຢືນຢັນຕົວຕົນ ແລະ ຕັ້ງລະຫັດຜ່ານໃໝ່</h1>
+        <!-- ຂັ້ນຕອນທີ 1: ຢືນຢັນ OTP -->
+        <div id="otp-section">
+            <p>ກະລຸນາກວດສອບອີເມວຂອງທ່ານ ແລະ ປ້ອນລະຫັດ OTP 6 ຕົວເລກທີ່ໄດ້ຮັບ.</p>
+            <input type="text" id="otp-input" class="login-input" placeholder="ລະຫັດ OTP...">
+            <button id="verify-otp-btn" class="submit-btn">✔️ ຢືນຢັນລະຫັດ</button>
+        </div>
+        <!-- ຂັ້ນຕອນທີ 2: ຕັ້ງລະຫັດຜ່ານໃໝ່ (ເຊື່ອງໄວ້ກ່ອນ) -->
+        <div id="password-section" style="display: none;">
+            <p style="color: green; font-weight: bold;">ຢືນຢັນ OTP ສຳເລັດ. ກະລຸນາຕັ້ງລະຫັດຜ່ານໃໝ່ຂອງທ່ານ.</p>
+            <input type="password" id="new-password-input" class="login-input" placeholder="ລະຫັດຜ່ານໃໝ່...">
+            <input type="password" id="confirm-password-input" class="login-input" placeholder="ຢືນຢັນລະຫັດຜ່ານໃໝ່...">
+            <button id="update-password-btn" class="submit-btn">✔️ ບັນທຶກລະຫັດຜ່ານໃໝ່</button>
+        </div>
+        <div id="message-area" class="error-message" style="font-weight: bold;"></div>
+        <div id="otp-timer" style="font-size: 1.1em; margin-top: 10px;"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client-admin.js"></script>
+    <script src="admin_verify_otp.js"></script>
+</body>
+</html>
